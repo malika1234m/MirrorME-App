@@ -89,21 +89,4 @@ cd backend && npm run dev
 cd mobile && npx expo start
 ```
 
----
 
-## Sample Accounts
-
-Seeded after `npm run db:seed` — password for all: `Password123!`
-
-| Account | Email |
-|---|---|
-| User | aria@mirrorme.app |
-| User | noah@mirrorme.app |
-| Brand (verified) | studio.nomo@mirrorme.app |
-| Brand (verified) | hype.era@mirrorme.app |
-
----
-
-## License
-
-MIT
