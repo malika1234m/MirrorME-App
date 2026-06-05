@@ -49,7 +49,9 @@ export const getMe = async (req: AuthenticatedRequest, res: Response): Promise<v
     where: { id: req.userId },
     select: {
       id: true, email: true, username: true, displayName: true,
-      avatarUrl: true, bio: true, isVerified: true, isAdmin: true, createdAt: true,
+      avatarUrl: true, bio: true, isVerified: true, isAdmin: true,
+      height: true, weight: true, gender: true,
+      createdAt: true,
       _count: { select: { posts: true, followers: true, following: true } },
     },
   });

@@ -7,6 +7,9 @@ export interface User {
   bio: string | null;
   isVerified: boolean;
   isAdmin?: boolean;
+  height?: number | null;
+  weight?: number | null;
+  gender?: string | null;
   createdAt: string;
   _count?: {
     posts: number;
@@ -155,4 +158,27 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+}
+
+export interface WardrobeItem {
+  id: string;
+  productId: string;
+  createdAt: string;
+  product: Product;
+}
+
+export interface SizeRecommendation {
+  recommended: string;
+  confidence: number;
+  chest: number;
+  waist: number;
+  bmi: number;
+  allSizes: Array<{ size: string; fit: "too_small" | "snug" | "perfect" | "loose" | "too_large" }>;
+  note: string | null;
+}
+
+export interface UserMeasurements {
+  height: number | null;
+  weight: number | null;
+  gender: "male" | "female" | "unisex" | null;
 }

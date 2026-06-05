@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Linking, Alert } 
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Product } from "@types/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
@@ -15,9 +16,11 @@ interface Props {
   rank?: number;
   onPress?: () => void;
   showBrand?: boolean;
+  showTryOn?: boolean;
 }
 
-export const ProductCard: React.FC<Props> = ({ product, rank, onPress, showBrand = true }) => {
+export const ProductCard: React.FC<Props> = ({ product, rank, onPress, showBrand = true, showTryOn = false }) => {
+  const router = useRouter();
   const [saved, setSaved] = useState(false);
   const score = product.score;
 
@@ -41,6 +44,20 @@ export const ProductCard: React.FC<Props> = ({ product, rank, onPress, showBrand
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try { await businessService.saveProduct(product.id); }
     catch { setSaved((p) => !p); }
+  };
+
+  const handleTryOn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push({
+      pathname: "/wardrobe/try-on" as any,
+      params: {
+        productId: product.id,
+        imageUrl: product.imageUrl,
+        title: product.title,
+        clothingType: product.clothingTypes[0] || "top",
+        sizes: JSON.stringify(product.sizes),
+      },
+    });
   };
 
   return (
@@ -123,16 +140,26 @@ export const ProductCard: React.FC<Props> = ({ product, rank, onPress, showBrand
             )}
           </View>
 
-          <TouchableOpacity style={styles.shopBtn} onPress={handleShop} activeOpacity={0.85}>
-            <LinearGradient
-              colors={Colors.gradient.primary}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              style={styles.shopBtnInner}
-            >
-              <Text style={styles.shopBtnText}>Shop</Text>
-              <Ionicons name="arrow-forward" size={13} color={Colors.background} />
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={styles.actionBtns}>
+            {showTryOn && (
+              <TouchableOpacity style={styles.tryOnBtn} onPress={handleTryOn} activeOpacity={0.85}>
+                <View style={styles.tryOnBtnInner}>
+                  <Ionicons name="camera-outline" size={13} color={Colors.primary} />
+                  <Text style={styles.tryOnBtnText}>Try</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.shopBtn} onPress={handleShop} activeOpacity={0.85}>
+              <LinearGradient
+                colors={Colors.gradient.primary}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={styles.shopBtnInner}
+              >
+                <Text style={styles.shopBtnText}>Shop</Text>
+                <Ionicons name="arrow-forward" size={13} color={Colors.background} />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -178,6 +205,15 @@ const styles = StyleSheet.create({
   },
   tagText: { color: Colors.primary, fontSize: 10, fontWeight: "600" },
   bottom: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  actionBtns: { flexDirection: "row", alignItems: "center", gap: 8 },
+  tryOnBtn: {
+    borderRadius: Radius.xl, borderWidth: 1.5, borderColor: Colors.primary,
+  },
+  tryOnBtnInner: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 11, paddingVertical: 8,
+  },
+  tryOnBtnText: { color: Colors.primary, fontSize: 12, fontWeight: "800" },
   price: { ...Typography.title3, color: Colors.text.primary },
   priceTbd: { ...Typography.body, color: Colors.text.tertiary },
   sizes: { ...Typography.caption, color: Colors.text.tertiary, marginTop: 2 },

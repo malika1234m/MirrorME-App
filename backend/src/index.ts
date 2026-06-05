@@ -16,6 +16,7 @@ import businessRoutes from "./routes/business";
 import productRoutes from "./routes/products";
 import matchRoutes from "./routes/match";
 import adminRoutes from "./routes/admin";
+import wardrobeRoutes from "./routes/wardrobe";
 import { errorHandler, notFound } from "./middleware/errorHandler";
 
 const app = express();
@@ -60,6 +61,7 @@ app.use("/api/business", businessRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/match", matchRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/wardrobe", wardrobeRoutes);
 
 // Error handling
 app.use(notFound);

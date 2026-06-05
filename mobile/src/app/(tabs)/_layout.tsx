@@ -14,11 +14,11 @@ interface TabConfig {
 }
 
 const TABS: TabConfig[] = [
-  { name: "index",   title: "Home",    icon: "home-outline",     activeIcon: "home" },
-  { name: "explore", title: "Explore", icon: "search-outline",   activeIcon: "search" },
-  { name: "upload",  title: "",        icon: "add",              activeIcon: "add" },
-  { name: "rate",    title: "Rate",    icon: "star-outline",     activeIcon: "star" },
-  { name: "profile", title: "Profile", icon: "person-outline",   activeIcon: "person" },
+  { name: "index",    title: "Home",     icon: "home-outline",    activeIcon: "home" },
+  { name: "explore",  title: "Explore",  icon: "search-outline",  activeIcon: "search" },
+  { name: "upload",   title: "",         icon: "add",             activeIcon: "add" },
+  { name: "wardrobe", title: "Wardrobe", icon: "shirt-outline",   activeIcon: "shirt" },
+  { name: "profile",  title: "Profile",  icon: "person-outline",  activeIcon: "person" },
 ];
 
 const TabBarBackground = () =>

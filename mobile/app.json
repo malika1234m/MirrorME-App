@@ -16,8 +16,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.mirrorme.app",
       "infoPlist": {
-        "NSCameraUsageDescription": "MirrorME needs camera access to upload outfit photos.",
-        "NSPhotoLibraryUsageDescription": "MirrorME needs photo library access to upload outfit photos."
+        "NSCameraUsageDescription": "MirrorME needs camera access to upload outfit photos and use the Virtual Mirror try-on feature.",
+        "NSPhotoLibraryUsageDescription": "MirrorME needs photo library access to upload outfit photos.",
+        "NSMicrophoneUsageDescription": "MirrorME needs microphone access for the Virtual Mirror.",
+        "WKWebView.mediaType": "camera"
       }
     },
     "android": {
@@ -26,7 +28,7 @@
         "backgroundColor": "#0A0A0A"
       },
       "package": "com.mirrorme.app",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO"]
     },
     "plugins": [
       "expo-router",

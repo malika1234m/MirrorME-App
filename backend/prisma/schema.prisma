@@ -18,6 +18,9 @@ model User {
   avatarPublicId String?
   isVerified     Boolean  @default(false)
   isAdmin        Boolean  @default(false)
+  height         Float?
+  weight         Float?
+  gender         String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -34,8 +37,22 @@ model User {
   savedProducts   SavedProduct[]
   matchSearches   MatchSearch[]
   businessFollows BusinessFollow[]
+  wardrobeItems   WardrobeItem[]
 
   @@map("users")
+}
+
+model WardrobeItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("wardrobe_items")
 }
 
 model BusinessAccount {
@@ -102,6 +119,7 @@ model Product {
 
   business      BusinessAccount @relation(fields: [businessId], references: [id], onDelete: Cascade)
   savedProducts SavedProduct[]
+  wardrobeItems WardrobeItem[]
 
   @@map("products")
 }
