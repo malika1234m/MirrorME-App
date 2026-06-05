@@ -2,9 +2,17 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from "react"
 import {
   View, Text, TouchableOpacity, StyleSheet, Dimensions,
   Animated, ScrollView, TextInput, Alert, Platform,
-  KeyboardAvoidingView, Modal,
+  KeyboardAvoidingView, Modal, NativeModules,
 } from "react-native";
-import { WebView } from "react-native-webview";
+import Constants from "expo-constants";
+
+// react-native-webview is not bundled in Expo Go — use a safe conditional import
+// so the rest of the app keeps working when tested in Expo Go.
+const isExpoGo = Constants.appOwnership === "expo";
+let WebView: any = null;
+if (!isExpoGo) {
+  try { WebView = require("react-native-webview").WebView; } catch {}
+}
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -359,6 +367,45 @@ export default function TryOnScreen() {
       wardrobeService.updateMeasurements({ height: h, weight: w, gender }).catch(() => {});
     }, 50);
   };
+
+  /* ── Expo Go fallback: WebView not available ── */
+  if (isExpoGo || !WebView) {
+    return (
+      <View style={[styles.container, expoGoStyles.wrap]}>
+        <LinearGradient colors={[`${Colors.primary}18`, "transparent"]} style={expoGoStyles.glow} />
+        <View style={expoGoStyles.card}>
+          <LinearGradient colors={Colors.gradient.primary} style={expoGoStyles.icon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <Ionicons name="body" size={32} color={Colors.background} />
+          </LinearGradient>
+          <Text style={expoGoStyles.title}>Virtual Mirror</Text>
+          <Text style={expoGoStyles.sub}>
+            The AI body-tracking try-on requires a{"\n"}
+            <Text style={{ color: Colors.primary, fontWeight: "700" }}>Development Build</Text> — it uses a native
+            camera module not included in Expo Go.
+          </Text>
+          <View style={expoGoStyles.steps}>
+            {[
+              "Run: npx expo run:ios  (or run:android)",
+              "Or build with EAS: eas build --profile development",
+              "Install the build on your device and open it",
+            ].map((s, i) => (
+              <View key={i} style={expoGoStyles.step}>
+                <View style={expoGoStyles.stepDot} />
+                <Text style={expoGoStyles.stepText}>{s}</Text>
+              </View>
+            ))}
+          </View>
+          <Text style={expoGoStyles.note}>
+            All other features (Wardrobe, Size Recommender, Browse) work fully in Expo Go.
+          </Text>
+        </View>
+        <TouchableOpacity style={expoGoStyles.backBtn} onPress={() => router.back()} activeOpacity={0.85}>
+          <Ionicons name="chevron-back" size={16} color={Colors.text.secondary} />
+          <Text style={expoGoStyles.backText}>Back to Wardrobe</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   /* ── Render ── */
   return (
@@ -920,4 +967,45 @@ const styles = StyleSheet.create({
     marginTop: 4, marginBottom: 8,
   },
   doneBtnText: { ...Typography.label, color: Colors.text.secondary },
+});
+
+const expoGoStyles = StyleSheet.create({
+  wrap: {
+    flex: 1, alignItems: "center", justifyContent: "center",
+    paddingHorizontal: Spacing.xl,
+  },
+  glow: {
+    position: "absolute", top: 0, left: 0, right: 0, height: H * 0.4,
+  },
+  card: {
+    width: "100%", backgroundColor: Colors.surface,
+    borderRadius: Radius.xxl, borderWidth: 1, borderColor: Colors.border,
+    padding: 24, alignItems: "center", gap: 14, overflow: "hidden",
+  },
+  icon: {
+    width: 72, height: 72, borderRadius: 22,
+    alignItems: "center", justifyContent: "center",
+  },
+  title: { ...Typography.title2, color: Colors.text.primary },
+  sub: {
+    ...Typography.body, color: Colors.text.secondary,
+    textAlign: "center", lineHeight: 22,
+  },
+  steps: { width: "100%", gap: 10 },
+  step: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  stepDot: {
+    width: 7, height: 7, borderRadius: 4,
+    backgroundColor: Colors.primary, marginTop: 5, flexShrink: 0,
+  },
+  stepText: { ...Typography.bodySmall, color: Colors.text.secondary, flex: 1, lineHeight: 18 },
+  note: {
+    ...Typography.caption, color: Colors.text.tertiary,
+    textAlign: "center", lineHeight: 17,
+  },
+  backBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    marginTop: 24, paddingVertical: 11, paddingHorizontal: 20,
+    borderRadius: Radius.xl, borderWidth: 1, borderColor: Colors.border,
+  },
+  backText: { ...Typography.label, color: Colors.text.secondary },
 });
