@@ -16,8 +16,8 @@ interface TabConfig {
 const TABS: TabConfig[] = [
   { name: "index",    title: "Home",     icon: "home-outline",    activeIcon: "home" },
   { name: "explore",  title: "Explore",  icon: "search-outline",  activeIcon: "search" },
-  { name: "upload",   title: "",         icon: "add",             activeIcon: "add" },
-  { name: "wardrobe", title: "Wardrobe", icon: "shirt-outline",   activeIcon: "shirt" },
+  { name: "wardrobe", title: "",         icon: "shirt-outline",   activeIcon: "shirt" },
+  { name: "rate",     title: "Rate",     icon: "star-outline",    activeIcon: "star" },
   { name: "profile",  title: "Profile",  icon: "person-outline",  activeIcon: "person" },
 ];
 
@@ -47,9 +47,9 @@ export default function TabsLayout() {
           options={{
             title,
             tabBarIcon: ({ focused, color, size }) =>
-              name === "upload" ? (
-                <View style={styles.uploadBtn}>
-                  <Ionicons name="add" size={26} color={Colors.background} />
+              name === "wardrobe" ? (
+                <View style={styles.mirrorBtn}>
+                  <Ionicons name="shirt" size={24} color={Colors.background} />
                 </View>
               ) : (
                 <Ionicons
@@ -61,6 +61,9 @@ export default function TabsLayout() {
           }}
         />
       ))}
+
+      {/* Upload is accessible via the Home header + button */}
+      <Tabs.Screen name="upload" options={{ href: null }} />
     </Tabs>
   );
 }
@@ -77,18 +80,18 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   tabLabel: { fontSize: 10, fontWeight: "600", letterSpacing: 0.3, marginTop: 2 },
-  uploadBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+  mirrorBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: -10,
+    marginTop: -14,
     shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.55,
+    shadowRadius: 14,
+    elevation: 10,
   },
 });

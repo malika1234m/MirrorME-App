@@ -36,6 +36,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logout: async () => {
+    // Invalidate token server-side (increments tokenVersion so existing tokens stop working)
+    try { await authService.logout(); } catch {}
     await api.clearToken();
     set({ user: null, token: null, isAuthenticated: false });
   },

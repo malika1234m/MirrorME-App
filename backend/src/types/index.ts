@@ -8,6 +8,7 @@ export interface AuthenticatedRequest extends Request {
 export interface JwtPayload {
   userId: string;
   email: string;
+  tokenVersion?: number;
   iat?: number;
   exp?: number;
 }

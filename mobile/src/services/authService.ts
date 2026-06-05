@@ -16,4 +16,15 @@ export const authService = {
     api.patch<ApiResponse<User>>("/auth/profile", data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
+
+  logout: () => api.post<ApiResponse<null>>("/auth/logout"),
+
+  forgotPassword: (email: string) =>
+    api.post<ApiResponse<null>>("/auth/forgot-password", { email }),
+
+  resetPassword: (token: string, newPassword: string) =>
+    api.post<ApiResponse<null>>("/auth/reset-password", { token, newPassword }),
+
+  deleteAccount: (password: string) =>
+    api.delete<ApiResponse<null>>("/auth/account", { data: { password } }),
 };

@@ -11,6 +11,7 @@ import { authService } from "@services/authService";
 import { useImagePicker } from "@hooks/useImagePicker";
 import { Avatar } from "@components/ui/Avatar";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -20,6 +21,11 @@ export default function EditProfileScreen() {
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [username, setUsername] = useState(user?.username ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
+  const [height, setHeight] = useState(user?.height ? String(user.height) : "");
+  const [weight, setWeight] = useState(user?.weight ? String(user.weight) : "");
+  const [gender, setGender] = useState<"male" | "female" | "unisex">(
+    (user?.gender as "male" | "female" | "unisex") ?? "unisex"
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const handleAvatarPress = () =>
@@ -38,6 +44,9 @@ export default function EditProfileScreen() {
       form.append("bio", bio.trim());
       if (username.trim() !== user?.username) form.append("username", username.trim());
       if (image) form.append("avatar", { uri: image.uri, type: image.type, name: image.name } as never);
+      if (height) form.append("height", height);
+      if (weight) form.append("weight", weight);
+      form.append("gender", gender);
       const res = await authService.updateProfile(form);
       if (res.data) updateUser(res.data);
       router.back();
@@ -120,6 +129,52 @@ export default function EditProfileScreen() {
               />
               <Text style={styles.charCount}>{bio.length}/150</Text>
             </FieldRow>
+
+            {/* Body measurements for size recommender */}
+            <FieldRow label="Size Measurements">
+              <Text style={styles.measureHint}>Used for AI size recommendations in the Virtual Mirror</Text>
+              <View style={styles.measureRow}>
+                <View style={styles.measureField}>
+                  <Text style={styles.measureLabel}>Height (cm)</Text>
+                  <TextInput
+                    style={styles.measureInput}
+                    value={height}
+                    onChangeText={setHeight}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g. 170"
+                    placeholderTextColor={Colors.text.tertiary}
+                    selectionColor={Colors.primary}
+                  />
+                </View>
+                <View style={styles.measureField}>
+                  <Text style={styles.measureLabel}>Weight (kg)</Text>
+                  <TextInput
+                    style={styles.measureInput}
+                    value={weight}
+                    onChangeText={setWeight}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g. 65"
+                    placeholderTextColor={Colors.text.tertiary}
+                    selectionColor={Colors.primary}
+                  />
+                </View>
+              </View>
+              <Text style={styles.measureLabel}>Fit preference</Text>
+              <View style={styles.genderRow}>
+                {(["male", "female", "unisex"] as const).map((g) => (
+                  <TouchableOpacity
+                    key={g}
+                    style={[styles.genderChip, gender === g && styles.genderChipActive]}
+                    onPress={() => setGender(g)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.genderText, gender === g && styles.genderTextActive]}>
+                      {g === "male" ? "Men's" : g === "female" ? "Women's" : "Unisex"}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </FieldRow>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -173,4 +228,22 @@ const styles = StyleSheet.create({
   usernameRow: { flexDirection: "row", alignItems: "center" },
   atSymbol: { color: Colors.text.tertiary, ...Typography.body, marginRight: 2 },
   charCount: { color: Colors.text.tertiary, ...Typography.caption, textAlign: "right", marginTop: 6 },
+  measureHint: { ...Typography.caption, color: Colors.text.tertiary, marginBottom: 10, lineHeight: 16 },
+  measureRow: { flexDirection: "row", gap: 12, marginBottom: 14 },
+  measureField: { flex: 1, gap: 5 },
+  measureLabel: { ...Typography.caption, color: Colors.text.tertiary, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6 },
+  measureInput: {
+    color: Colors.text.primary, ...Typography.body,
+    backgroundColor: Colors.surface, borderRadius: Radius.lg,
+    borderWidth: 1, borderColor: Colors.border,
+    paddingHorizontal: Spacing.md, paddingVertical: 10,
+  },
+  genderRow: { flexDirection: "row", gap: 8 },
+  genderChip: {
+    flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: Radius.lg,
+    backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border,
+  },
+  genderChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  genderText: { ...Typography.label, color: Colors.text.secondary },
+  genderTextActive: { color: Colors.background, fontWeight: "800" },
 });

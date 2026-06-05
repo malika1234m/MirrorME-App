@@ -123,6 +123,8 @@ export default function WardrobeScreen() {
   const [search, setSearch] = useState("");
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogPage, setCatalogPage] = useState(1);
+  const [catalogHasMore, setCatalogHasMore] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -132,16 +134,17 @@ export default function WardrobeScreen() {
   searchRef.current = search;
   catRef.current = selectedCat;
 
-  const fetchCatalog = useCallback(async (q?: string, cat?: string) => {
+  const fetchCatalog = useCallback(async (q?: string, cat?: string, page = 1) => {
     setCatalogLoading(true);
     try {
-      const res = await wardrobeService.getCatalog({
-        category: cat,
-        search: q || undefined,
-      });
-      if (res.data) setCatalog(res.data);
+      const res = await wardrobeService.getCatalog({ category: cat, search: q || undefined, page });
+      if (res.data) {
+        setCatalog((prev) => page === 1 ? res.data! : [...prev, ...res.data!]);
+        setCatalogHasMore((res.data?.length ?? 0) === 20);
+        setCatalogPage(page);
+      }
     } catch {
-      setCatalog([]);
+      if (page === 1) setCatalog([]);
     } finally {
       setCatalogLoading(false);
     }
@@ -153,9 +156,12 @@ export default function WardrobeScreen() {
     fetchCatalog();
   }, []);
 
-  // Reload catalog when category changes
+  // Reset and reload when category changes
   useEffect(() => {
-    fetchCatalog(searchRef.current, selectedCat);
+    setCatalog([]);
+    setCatalogPage(1);
+    setCatalogHasMore(true);
+    fetchCatalog(searchRef.current, selectedCat, 1);
   }, [selectedCat]);
 
   // Debounce search
@@ -224,7 +230,7 @@ export default function WardrobeScreen() {
             start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
           >
             <Ionicons name="camera" size={17} color={Colors.background} />
-            <Text style={styles.mirrorBtnText}>Virtual Mirror</Text>
+            <Text style={styles.mirrorBtnText}>Open Mirror</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -297,7 +303,9 @@ export default function WardrobeScreen() {
 
       {/* ── Content ── */}
       {activeTab === "mine" && items.length === 0 && !wardrobeLoading ? (
-        <EmptyWardrobe onBrowse={() => setActiveTab("browse")} />
+        <View style={{ flex: 1, paddingBottom: insets.bottom + 80 }}>
+          <EmptyWardrobe onBrowse={() => setActiveTab("browse")} />
+        </View>
       ) : (
         <FlatList
           key={activeTab}
@@ -310,6 +318,12 @@ export default function WardrobeScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
           }
+          onEndReached={() => {
+            if (activeTab === "browse" && catalogHasMore && !catalogLoading) {
+              fetchCatalog(searchRef.current, catRef.current, catalogPage + 1);
+            }
+          }}
+          onEndReachedThreshold={0.4}
           ListHeaderComponent={
             activeTab === "browse" && !catalogLoading && catalog.length > 0 ? (
               <View style={styles.howItWorks}>

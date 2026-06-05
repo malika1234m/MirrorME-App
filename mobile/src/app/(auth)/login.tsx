@@ -102,7 +102,7 @@ export default function LoginScreen() {
 
             <TouchableOpacity
               style={styles.forgotBtn}
-              onPress={() => Alert.alert("Reset Password", "Password reset is coming soon. Contact support at support@mirrorme.app")}
+              onPress={() => router.push("/(auth)/forgot-password" as any)}
             >
               <Text style={styles.forgotText}>Forgot password?</Text>
             </TouchableOpacity>

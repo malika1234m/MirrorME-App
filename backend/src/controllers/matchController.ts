@@ -34,26 +34,23 @@ export const matchByPhoto = async (req: AuthenticatedRequest, res: Response): Pr
   // Try AI embedding match first
   const productsWithEmbeddings = allProducts.filter((p) => p.embedding && p.embedding.length > 0);
 
-  let results: Array<typeof allProducts[0] & { score: number }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let results: any[];
   let matchMethod = "ai";
 
   if (productsWithEmbeddings.length > 0) {
     try {
       const queryEmbedding = await embedImage(dataUrl);
-      results = productsWithEmbeddings
-        .map(({ embedding, ...rest }) => ({
-          ...rest,
-          score: cosineSimilarity(queryEmbedding, embedding),
-        }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 20);
+      results = productsWithEmbeddings.map(({ embedding, ...rest }) => ({
+        ...rest,
+        score: cosineSimilarity(queryEmbedding, embedding),
+      })).sort((a, b) => b.score - a.score).slice(0, 20);
     } catch (aiErr) {
-      console.warn("AI embedding failed, falling back to catalog match:", aiErr instanceof Error ? aiErr.message : aiErr);
+      console.warn("AI embedding failed, falling back to catalog:", aiErr instanceof Error ? aiErr.message : aiErr);
       matchMethod = "catalog";
       results = fallbackMatch(allProducts);
     }
   } else {
-    // No embeddings stored yet — return full catalog sorted by recency
     matchMethod = "catalog";
     results = fallbackMatch(allProducts);
   }
@@ -79,9 +76,8 @@ export const matchByPhoto = async (req: AuthenticatedRequest, res: Response): Pr
 
 function fallbackMatch(
   products: Array<{ embedding: number[]; [key: string]: unknown }>
-): Array<typeof products[0] & { score: number }> {
-  // Return all products with a default score, spread evenly so they all appear
-  return products.map(({ embedding, ...rest }, i) => ({
+): Array<Record<string, unknown> & { score: number }> {
+  return products.map(({ embedding: _e, ...rest }, i) => ({
     ...rest,
     score: 1 - i * 0.01,
   }));

@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#0A0A0A"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.mirrorme.app",
@@ -29,7 +31,12 @@
         "monochromeImage": "./assets/adaptive-icon.png"
       },
       "package": "com.mirrorme.app",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO"]
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -40,8 +47,17 @@
           "photosPermission": "MirrorME needs access to your photos to upload outfits.",
           "cameraPermission": "MirrorME needs camera access to take outfit photos."
         }
-      ]
+      ],
+      "expo-font"
     ],
+    "web": {
+      "favicon": "./assets/icon.png",
+      "bundler": "metro",
+      "output": "static",
+      "name": "MirrorME",
+      "shortName": "MirrorME",
+      "description": "AI Fashion Social — Try on brands, get rated, discover styles"
+    },
     "scheme": "mirrorme",
     "experiments": {
       "typedRoutes": true

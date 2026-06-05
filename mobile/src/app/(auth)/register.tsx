@@ -32,7 +32,7 @@ export default function RegisterScreen() {
     } else if (step === 1) {
       if (!isValidUsername(form.username)) errs.username = "3–30 chars, letters/numbers/underscore";
     } else {
-      if (!isValidPassword(form.password)) errs.password = "At least 6 characters";
+      if (form.password.length < 8) errs.password = "Password must be at least 8 characters";
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -129,16 +129,19 @@ export default function RegisterScreen() {
             )}
 
             {step === 2 && (
-              <Input
-                label="Password"
-                value={form.password}
-                onChangeText={setField("password")}
-                isPassword
-                leftIcon="lock-closed-outline"
-                error={errors.password}
-                placeholder="Min. 6 characters"
-                hint="Use a strong, unique password"
-              />
+              <>
+                <Input
+                  label="Password"
+                  value={form.password}
+                  onChangeText={setField("password")}
+                  isPassword
+                  leftIcon="lock-closed-outline"
+                  error={errors.password}
+                  placeholder="Min. 8 characters"
+                  hint="Use uppercase, numbers and symbols for a stronger password"
+                />
+                {form.password.length > 0 && <PasswordStrength password={form.password} />}
+              </>
             )}
 
             <Button
@@ -153,8 +156,9 @@ export default function RegisterScreen() {
             {step === STEPS.length - 1 && (
               <Text style={styles.terms}>
                 By creating an account you agree to our{" "}
-                <Text style={{ color: Colors.primary }}>Terms</Text> &{" "}
-                <Text style={{ color: Colors.primary }}>Privacy Policy</Text>
+                <Text style={{ color: Colors.primary }} onPress={() => router.push("/legal" as any)}>Terms of Service</Text>
+                {" "}&amp;{" "}
+                <Text style={{ color: Colors.primary }} onPress={() => router.push("/legal" as any)}>Privacy Policy</Text>
               </Text>
             )}
           </View>
@@ -170,6 +174,45 @@ export default function RegisterScreen() {
     </View>
   );
 }
+
+/* ── Password strength indicator ── */
+function getStrength(pw: string): { score: number; label: string; color: string } {
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  if (score <= 1) return { score, label: "Weak",   color: Colors.error };
+  if (score <= 2) return { score, label: "Fair",   color: Colors.warning };
+  if (score <= 3) return { score, label: "Good",   color: Colors.info };
+  return              { score, label: "Strong", color: Colors.success };
+}
+
+const PasswordStrength = ({ password }: { password: string }) => {
+  const { score, label, color } = getStrength(password);
+  const bars = [1, 2, 3, 4];
+  return (
+    <View style={strengthStyles.wrap}>
+      <View style={strengthStyles.bars}>
+        {bars.map((b) => (
+          <View
+            key={b}
+            style={[strengthStyles.bar, { backgroundColor: b <= score ? color : Colors.border }]}
+          />
+        ))}
+      </View>
+      <Text style={[strengthStyles.label, { color }]}>{label}</Text>
+    </View>
+  );
+};
+
+const strengthStyles = StyleSheet.create({
+  wrap: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: -8, marginBottom: 8 },
+  bars: { flex: 1, flexDirection: "row", gap: 4 },
+  bar: { flex: 1, height: 4, borderRadius: 2 },
+  label: { ...Typography.caption, fontWeight: "700", minWidth: 44, textAlign: "right" },
+});
 
 const styles = StyleSheet.create({
   header: {

@@ -11,17 +11,20 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
+  const isProd = process.env.NODE_ENV === "production";
   const statusCode = err.statusCode || 500;
-  const message = err.isOperational ? err.message : "Internal server error";
 
-  if (process.env.NODE_ENV === "development") {
-    console.error("Error:", err);
-  }
+  // In production, never expose internal error details
+  const message = isProd && !err.isOperational
+    ? "Something went wrong. Please try again."
+    : err.message || "Internal server error";
+
+  if (!isProd) console.error("Error:", err);
 
   res.status(statusCode).json({
     success: false,
     message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    ...(!isProd && { stack: err.stack }),
   });
 };
 

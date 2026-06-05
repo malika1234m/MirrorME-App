@@ -119,21 +119,24 @@ export default function HomeScreen() {
 }
 
 /* ─── Empty state ────────────────────────────────────────────────── */
-const EmptyFeed = () => (
-  <View style={styles.empty}>
-    <View style={styles.emptyIconBox}>
-      <Ionicons name="shirt-outline" size={40} color={Colors.primary} />
+const EmptyFeed = () => {
+  const router = useRouter();
+  return (
+    <View style={styles.empty}>
+      <View style={styles.emptyIconBox}>
+        <Ionicons name="shirt-outline" size={40} color={Colors.primary} />
+      </View>
+      <Text style={styles.emptyTitle}>Your feed is empty</Text>
+      <Text style={styles.emptySubtext}>
+        Follow fashion creators to see their latest looks here
+      </Text>
+      <TouchableOpacity style={styles.exploreCta} onPress={() => router.push("/(tabs)/explore")}>
+        <Ionicons name="search-outline" size={16} color={Colors.primary} />
+        <Text style={styles.exploreCtaText}>Discover Creators</Text>
+      </TouchableOpacity>
     </View>
-    <Text style={styles.emptyTitle}>Your feed is empty</Text>
-    <Text style={styles.emptySubtext}>
-      Follow fashion creators to see their latest looks here
-    </Text>
-    <TouchableOpacity style={styles.exploreCta} onPress={() => router.push("/(tabs)/explore")}>
-      <Ionicons name="search-outline" size={16} color={Colors.primary} />
-      <Text style={styles.exploreCtaText}>Discover Creators</Text>
-    </TouchableOpacity>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },

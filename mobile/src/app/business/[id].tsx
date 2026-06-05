@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Linking, ActivityIndicator, RefreshControl, Share,
+  StyleSheet, Linking, ActivityIndicator, RefreshControl, Share, Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -260,6 +260,7 @@ export default function BusinessProfileScreen() {
                 key={product.id}
                 product={product}
                 showBrand={false}
+                showTryOn
                 onPress={() => {
                   if (product.shopLink) openUrl(product.shopLink);
                 }}

@@ -76,6 +76,35 @@ export default function ProfileScreen() {
       { text: "Sign Out", style: "destructive", onPress: logout },
     ]);
 
+  const handleDeleteAccount = () =>
+    Alert.alert(
+      "Delete Account",
+      "This permanently deletes your account and all your data. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete Account",
+          style: "destructive",
+          onPress: () =>
+            Alert.prompt(
+              "Confirm Password",
+              "Enter your password to confirm account deletion.",
+              async (password) => {
+                if (!password) return;
+                try {
+                  const { authService } = await import("@services/authService");
+                  await authService.deleteAccount(password);
+                  logout();
+                } catch (err: unknown) {
+                  Alert.alert("Error", err instanceof Error ? err.message : "Failed to delete account");
+                }
+              },
+              "secure-text"
+            ),
+        },
+      ]
+    );
+
   const onRefresh = async () => {
     setIsRefreshing(true);
     await fetchProfile();
@@ -99,6 +128,13 @@ export default function ProfileScreen() {
               <Ionicons name="shield-checkmark" size={18} color={Colors.primary} />
             </TouchableOpacity>
           )}
+          {/* Upload new outfit post */}
+          <TouchableOpacity
+            style={[styles.navBtn, styles.uploadPostBtn]}
+            onPress={() => router.push("/(tabs)/upload" as any)}
+          >
+            <Ionicons name="camera-outline" size={20} color={Colors.background} />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.navBtn} onPress={() => router.push("/stories/create")}>
             <Ionicons name="add-circle-outline" size={24} color={Colors.text.primary} />
           </TouchableOpacity>
@@ -213,6 +249,21 @@ export default function ProfileScreen() {
         ) : (
           <EmptySaved />
         )}
+
+        {/* Settings footer */}
+        <View style={styles.settingsFooter}>
+          <TouchableOpacity style={styles.settingsRow} onPress={() => router.push("/legal" as any)} activeOpacity={0.8}>
+            <Ionicons name="document-text-outline" size={18} color={Colors.text.secondary} />
+            <Text style={styles.settingsRowText}>Terms &amp; Privacy Policy</Text>
+            <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+          </TouchableOpacity>
+          <View style={styles.settingsDivider} />
+          <TouchableOpacity style={styles.settingsRow} onPress={handleDeleteAccount} activeOpacity={0.8}>
+            <Ionicons name="trash-outline" size={18} color={Colors.error} />
+            <Text style={[styles.settingsRowText, { color: Colors.error }]}>Delete Account</Text>
+            <Ionicons name="chevron-forward" size={16} color={Colors.error} />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       {/* Followers / Following modal */}
@@ -291,6 +342,7 @@ const styles = StyleSheet.create({
   navUsername: { ...Typography.title3, color: Colors.text.primary },
   navActions: { flexDirection: "row", gap: 4 },
   adminBtn: { backgroundColor: Colors.primarySubtle, borderColor: `${Colors.primary}40` },
+  uploadPostBtn: { backgroundColor: Colors.primary, borderRadius: 12 },
   navBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
   tabBar: { flexDirection: "row", borderTopWidth: 0.5, borderTopColor: Colors.border },
   tab: {
@@ -354,4 +406,15 @@ const styles = StyleSheet.create({
   },
   createBrandTitle: { ...Typography.labelLarge, color: Colors.primary },
   createBrandSub: { ...Typography.caption, color: Colors.text.tertiary, marginTop: 2 },
+  settingsFooter: {
+    marginHorizontal: Spacing.lg, marginVertical: Spacing.xl,
+    backgroundColor: Colors.card, borderRadius: Radius.xl,
+    borderWidth: 1, borderColor: Colors.border, overflow: "hidden",
+  },
+  settingsRow: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingHorizontal: Spacing.lg, paddingVertical: 14,
+  },
+  settingsRowText: { flex: 1, ...Typography.label, color: Colors.text.secondary },
+  settingsDivider: { height: 0.5, backgroundColor: Colors.border, marginHorizontal: Spacing.lg },
 });

@@ -286,7 +286,7 @@ export default function TryOnScreen() {
   const PANEL_COLLAPSED = 70;
   const PANEL_FULL = useMemo(() => (items.length > 1 ? 230 : 160), [items.length]);
 
-  const webViewRef = useRef<WebView>(null);
+  const webViewRef = useRef<typeof WebView extends new (...args: any[]) => infer R ? R : any>(null);
   const htmlContent = useRef(buildTryOnHtml(params.imageUrl, params.clothingType || "top")).current;
 
   useEffect(() => {

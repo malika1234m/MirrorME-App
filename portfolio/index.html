@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MirrorME — AI Fashion Social App</title>
+<meta name="description" content="Try on brands' clothes with AI body tracking, get your outfits rated by the community, and discover similar styles." />
+<meta property="og:title" content="MirrorME — AI Fashion Social" />
+<meta property="og:description" content="Virtual try-on, AI outfit analysis, community ratings. Built with React Native, Expo, Node.js & GPT-4o." />
+<meta property="og:image" content="./preview.png" />
+<style>
+  :root {
+    --bg: #080808; --surface: #111; --card: #161616;
+    --border: #242424; --primary: #C8FF00; --accent: #FF3CAC;
+    --purple: #8B5CF6; --text: #fff; --muted: #8E8E93;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(8,8,8,0.9); backdrop-filter: blur(12px); z-index: 100; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#FF3CAC,#8B5CF6); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .nav-name { font-weight: 900; font-size: 20px; color: var(--primary); letter-spacing: -0.5px; }
+  .nav-links { display: flex; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; text-decoration: none; transition: opacity .2s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-outline { border: 1.5px solid var(--border); color: var(--muted); }
+  .btn-primary { background: var(--primary); color: #080808; }
+
+  /* HERO */
+  .hero { padding: 100px 40px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(200,255,0,.08), transparent); pointer-events: none; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(200,255,0,.1); border: 1px solid rgba(200,255,0,.25); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 24px; }
+  .hero h1 { font-size: clamp(42px, 7vw, 80px); font-weight: 900; letter-spacing: -2px; line-height: 1; margin-bottom: 24px; }
+  .hero h1 span { background: linear-gradient(135deg,var(--primary),#78D500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero p { font-size: 20px; color: var(--muted); max-width: 580px; margin: 0 auto 40px; line-height: 1.6; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-lg { padding: 14px 28px; font-size: 16px; border-radius: 16px; }
+
+  /* TECH STACK */
+  .stack { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 40px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .stack-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--muted); }
+
+  /* FEATURES */
+  .section { padding: 80px 40px; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: var(--primary); text-transform: uppercase; margin-bottom: 12px; }
+  .section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1px; margin-bottom: 16px; }
+  .section-sub { color: var(--muted); font-size: 17px; max-width: 560px; line-height: 1.6; margin-bottom: 56px; }
+
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .feature-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 28px; transition: border-color .2s; }
+  .feature-card:hover { border-color: rgba(200,255,0,.3); }
+  .feature-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+  .feature-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+  .feature-card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  /* SCREENS */
+  .screens { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 80px 40px; text-align: center; }
+  .screens-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; max-width: 900px; margin: 40px auto 0; }
+  .screen-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; text-align: left; }
+  .screen-card h4 { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+  .screen-card ul { list-style: none; }
+  .screen-card ul li { font-size: 13px; color: var(--muted); padding: 3px 0; }
+  .screen-card ul li::before { content: '→ '; color: var(--primary); }
+
+  /* TECH DEEP DIVE */
+  .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .tech-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+  .tech-card .category { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  .tech-card .item { font-size: 14px; color: var(--text); padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .tech-card .item:last-child { border-bottom: none; }
+
+  /* CTA */
+  .cta { text-align: center; padding: 100px 40px; position: relative; overflow: hidden; }
+  .cta::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 50% 100%, rgba(200,255,0,.06), transparent); pointer-events: none; }
+  .cta h2 { font-size: clamp(32px, 5vw, 56px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 16px; }
+  .cta p { color: var(--muted); font-size: 18px; margin-bottom: 40px; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  footer p { color: var(--muted); font-size: 14px; }
+  .footer-links { display: flex; gap: 16px; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  .footer-links a:hover { color: var(--primary); }
+
+  @media (max-width: 600px) {
+    nav { padding: 16px 20px; }
+    .hero { padding: 60px 20px; }
+    .section { padding: 60px 20px; }
+    .hero-btns { flex-direction: column; align-items: center; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">👗</div>
+    <span class="nav-name">MirrorME</span>
+  </div>
+  <div class="nav-links">
+    <a href="https://github.com/malikanishnatha4" class="btn btn-outline" target="_blank">GitHub</a>
+    <a href="REPLACE_WITH_VERCEL_URL" class="btn btn-primary">Try Demo →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ Full-Stack Mobile App · React Native + Node.js</div>
+  <h1>The <span>AI Fashion</span><br/>Social Platform</h1>
+  <p>Try on brand clothes with live body tracking, get your outfits rated by the community, and let GPT-4o analyse your style.</p>
+  <div class="hero-btns">
+    <a href="REPLACE_WITH_VERCEL_URL" class="btn btn-primary btn-lg">🚀 Open Live Demo</a>
+    <a href="https://github.com/malikanishnatha4" class="btn btn-outline btn-lg" target="_blank">View Source Code</a>
+  </div>
+</section>
+
+<!-- STACK PILLS -->
+<div class="stack">
+  <span class="stack-chip">React Native</span>
+  <span class="stack-chip">Expo SDK 54</span>
+  <span class="stack-chip">TypeScript</span>
+  <span class="stack-chip">Node.js + Express</span>
+  <span class="stack-chip">PostgreSQL + Prisma</span>
+  <span class="stack-chip">GPT-4o Vision</span>
+  <span class="stack-chip">MediaPipe Pose</span>
+  <span class="stack-chip">Cloudinary</span>
+  <span class="stack-chip">Zustand</span>
+  <span class="stack-chip">Expo Router</span>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Core Features</div>
+  <h2 class="section-title">Everything a fashion app needs</h2>
+  <p class="section-sub">Built from scratch — frontend, backend, AI integration, and real-time body tracking all in one system.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(200,255,0,.12)">🤖</div>
+      <h3>AI Outfit Analysis</h3>
+      <p>GPT-4o Vision detects clothing types, colours, and fashion styles the moment you upload — then gives real stylist tips.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,60,172,.12)">⭐</div>
+      <h3>Community Rating</h3>
+      <p>Tinder-style swipe deck. Rate outfits 1–10, swipe Fire or Pass, and track your outfit's average score from the community.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(139,92,246,.12)">🔍</div>
+      <h3>Visual Match Search</h3>
+      <p>Upload any photo and AI finds visually similar styles from verified brand catalogs using embedding cosine similarity.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(200,255,0,.12)">👗</div>
+      <h3>Virtual Wardrobe & Mirror</h3>
+      <p>Browse brand collections and try them on live using MediaPipe Pose body tracking — no app store download needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(0,230,118,.12)">📏</div>
+      <h3>AI Size Recommender</h3>
+      <p>Enter height and weight. The algorithm estimates chest/waist measurements and maps them to XS–XXXL with a confidence score.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,60,172,.12)">🏪</div>
+      <h3>Brand Storefronts</h3>
+      <p>Brands register, upload collections, and get discovered. Admin verification system, follow counts, and product analytics.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN BREAKDOWN -->
+<div class="screens">
+  <div class="section-label" style="text-align:center">Screen Breakdown</div>
+  <h2 class="section-title" style="text-align:center">25+ screens, fully connected</h2>
+  <div class="screens-grid">
+    <div class="screen-card">
+      <h4>Auth Flow</h4>
+      <ul>
+        <li>4-slide onboarding</li>
+        <li>Multi-step register</li>
+        <li>Forgot / reset password</li>
+        <li>JWT + token revocation</li>
+      </ul>
+    </div>
+    <div class="screen-card">
+      <h4>Home Feed</h4>
+      <ul>
+        <li>Infinite scroll feed</li>
+        <li>Stories bar</li>
+        <li>Trending section</li>
+        <li>Outfit of the Day</li>
+      </ul>
+    </div>
+    <div class="screen-card">
+      <h4>Explore</h4>
+      <ul>
+        <li>Style category filters</li>
+        <li>Live search</li>
+        <li>Brand directory</li>
+        <li>Masonry grid layout</li>
+      </ul>
+    </div>
+    <div class="screen-card">
+      <h4>Digital Wardrobe</h4>
+      <ul>
+        <li>Browse catalog</li>
+        <li>Save items</li>
+        <li>Virtual mirror</li>
+        <li>Size recommender</li>
+      </ul>
+    </div>
+    <div class="screen-card">
+      <h4>Profile</h4>
+      <ul>
+        <li>Style DNA analysis</li>
+        <li>Post & saved grid</li>
+        <li>Follow system</li>
+        <li>Brand dashboard</li>
+      </ul>
+    </div>
+    <div class="screen-card">
+      <h4>Admin Panel</h4>
+      <ul>
+        <li>Brand verification</li>
+        <li>User management</li>
+        <li>Content moderation</li>
+        <li>Platform stats</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TECH DEEP DIVE -->
+<section class="section">
+  <div class="section-label">Architecture</div>
+  <h2 class="section-title">How it's built</h2>
+  <p class="section-sub">Clean separation between frontend, backend, and AI services with proper security patterns.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="category">Frontend</div>
+      <div class="item">React Native + Expo SDK 54</div>
+      <div class="item">Expo Router v6 (file-based)</div>
+      <div class="item">Zustand state management</div>
+      <div class="item">NativeWind (Tailwind RN)</div>
+      <div class="item">expo-image, expo-blur</div>
+    </div>
+    <div class="tech-card">
+      <div class="category">Backend</div>
+      <div class="item">Node.js + Express + TypeScript</div>
+      <div class="item">PostgreSQL + Prisma ORM</div>
+      <div class="item">JWT + tokenVersion revocation</div>
+      <div class="item">express-validator + helmet</div>
+      <div class="item">Rate limiting + CORS</div>
+    </div>
+    <div class="tech-card">
+      <div class="category">AI & Media</div>
+      <div class="item">GPT-4o Vision (outfit analysis)</div>
+      <div class="item">Embedding similarity search</div>
+      <div class="item">MediaPipe Pose (body tracking)</div>
+      <div class="item">Cloudinary (image storage)</div>
+      <div class="item">Nodemailer (transactional email)</div>
+    </div>
+    <div class="tech-card">
+      <div class="category">Deployment</div>
+      <div class="item">Railway (backend + DB)</div>
+      <div class="item">Vercel (web frontend)</div>
+      <div class="item">Prisma migrations</div>
+      <div class="item">Environment-based config</div>
+      <div class="item">Hourly cleanup jobs</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Ready to explore?</h2>
+  <p>Click below to open the live web demo — no install required.</p>
+  <div class="hero-btns">
+    <a href="REPLACE_WITH_VERCEL_URL" class="btn btn-primary btn-lg">🚀 Open MirrorME Demo</a>
+    <a href="https://github.com/malikanishnatha4" class="btn btn-outline btn-lg" target="_blank">📂 View Source</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 MirrorME · Built by Malika Nishnatha</p>
+  <div class="footer-links">
+    <a href="/legal">Terms & Privacy</a>
+    <a href="mailto:malikanishnatha4@gmail.com">Contact</a>
+    <a href="https://github.com/malikanishnatha4" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
