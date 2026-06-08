@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { body } from "express-validator";
 import { ratePost, getPostRating } from "../controllers/ratingController";
 import { authenticate } from "../middleware/auth";

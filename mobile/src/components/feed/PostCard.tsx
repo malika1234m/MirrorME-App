@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { Post } from "@types/index";
+import { Post } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { Avatar } from "@components/ui/Avatar";
 import { Tag } from "@components/ui/Tag";

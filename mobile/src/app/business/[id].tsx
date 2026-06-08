@@ -12,7 +12,7 @@ import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@store/authStore";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { businessService } from "@services/businessService";
-import { Business, Product } from "@types/index";
+import { Business, Product } from "@models/index";
 import { ProductCard } from "@components/business/ProductCard";
 import { formatCount } from "@utils/formatters";
 

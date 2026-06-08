@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, Post, Comment, Rating } from "@types/index";
+import { ApiResponse, Post, Comment, Rating } from "@models/index";
 
 export const postService = {
   getFeed: (page = 1) =>

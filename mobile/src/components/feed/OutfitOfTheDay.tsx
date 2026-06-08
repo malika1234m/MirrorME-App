@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { aiService } from "@services/aiService";
-import { Post } from "@types/index";
+import { Post } from "@models/index";
 import { Avatar } from "@components/ui/Avatar";
 import { formatCount } from "@utils/formatters";
 

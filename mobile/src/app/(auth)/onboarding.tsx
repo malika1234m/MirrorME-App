@@ -8,6 +8,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors, Typography, Radius } from "@constants/colors";
 import { Button } from "@components/ui/Button";
+import { Logo } from "@components/ui/Logo";
 
 const { width: W, height: H } = Dimensions.get("window");
 
@@ -82,6 +83,8 @@ export default function OnboardingScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
+
+      <Logo size="sm" style={styles.logoRow} />
 
       <Animated.FlatList
         ref={flatRef}
@@ -181,6 +184,12 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+  logoRow: {
+    position: "absolute",
+    top: 56,
+    left: 24,
+    zIndex: 10,
+  },
 
   iconSection: {
     flex: 1,

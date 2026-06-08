@@ -13,7 +13,7 @@ import * as Haptics from "expo-haptics";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { useImagePicker } from "@hooks/useImagePicker";
 import { businessService } from "@services/businessService";
-import { Product } from "@types/index";
+import { Product } from "@models/index";
 import { ProductCard } from "@components/business/ProductCard";
 
 const { width: W, height: H } = Dimensions.get("window");

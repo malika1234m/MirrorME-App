@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { Post } from "@types/index";
+import { Post } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { formatCount } from "@utils/formatters";
 

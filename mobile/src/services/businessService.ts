@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, Business, Product } from "@types/index";
+import { ApiResponse, Business, Product } from "@models/index";
 
 export const businessService = {
   list: (params?: { category?: string; search?: string; page?: number }) => {

@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { OutfitAnalysis } from "@types/index";
+import { OutfitAnalysis } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { Tag } from "@components/ui/Tag";
 

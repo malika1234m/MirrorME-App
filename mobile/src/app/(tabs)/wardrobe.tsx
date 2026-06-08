@@ -13,7 +13,7 @@ import * as Haptics from "expo-haptics";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { useWardrobeStore } from "@store/wardrobeStore";
 import { wardrobeService } from "@services/wardrobeService";
-import { Product } from "@types/index";
+import { Product } from "@models/index";
 
 const { width: W } = Dimensions.get("window");
 const CARD_W = (W - Spacing.lg * 2 - Spacing.md) / 2;

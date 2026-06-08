@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { body } from "express-validator";
 import {
   register, login, getMe, updateProfile,

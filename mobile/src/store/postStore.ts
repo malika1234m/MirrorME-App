@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Post, Comment, OutfitAnalysis } from "@types/index";
+import { Post, Comment, OutfitAnalysis } from "@models/index";
 import { postService } from "@services/postService";
 import { aiService } from "@services/aiService";
 

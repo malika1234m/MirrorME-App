@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { Business } from "@types/index";
+import { Business } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { businessService } from "@services/businessService";
 import { formatCount } from "@utils/formatters";

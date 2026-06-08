@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, OutfitAnalysis, Post } from "@types/index";
+import { ApiResponse, OutfitAnalysis, Post } from "@models/index";
 
 export const aiService = {
   getAnalysis: (postId: string) =>

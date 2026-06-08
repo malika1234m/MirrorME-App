@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { wardrobeService } from "@services/wardrobeService";
-import { Product } from "@types/index";
+import { Product } from "@models/index";
 
 interface WardrobeStore {
   items: Product[];

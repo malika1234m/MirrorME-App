@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import {
   registerBusiness, getMyBusiness, getBusiness,
   updateBusiness, toggleFollow, listBusinesses, getFeaturedBusinesses,

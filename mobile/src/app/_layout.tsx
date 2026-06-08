@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useAuthStore } from "@store/authStore";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { LoadingSpinner } from "@components/ui/LoadingSpinner";
+import { Logo } from "@components/ui/Logo";
 import { api } from "@services/api";
 
 const APP_VERSION = "1.0.0"; // must match app.json version
@@ -47,6 +48,7 @@ export default function RootLayout() {
   if (updateRequired) {
     return (
       <View style={styles.updateScreen}>
+        <Logo size="md" style={styles.updateLogo} />
         <Text style={styles.updateTitle}>Update Required</Text>
         <Text style={styles.updateSub}>A new version of MirrorME is available. Please update to continue.</Text>
         <TouchableOpacity
@@ -137,7 +139,8 @@ export default function RootLayout() {
       {/* Loading overlay sits on top of the Stack so navigator always mounts */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
-          <LoadingSpinner fullScreen />
+          <Logo size="md" withTagline style={styles.loadingLogo} />
+          <LoadingSpinner />
         </View>
       )}
     </GestureHandlerRootView>
@@ -152,10 +155,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  loadingLogo: { marginBottom: Spacing.xxl },
   updateScreen: {
     flex: 1, backgroundColor: Colors.background,
     alignItems: "center", justifyContent: "center", padding: Spacing.xxl, gap: 16,
   },
+  updateLogo: { marginBottom: 8 },
   updateTitle: { ...Typography.title1, color: Colors.text.primary, textAlign: "center" },
   updateSub: { ...Typography.body, color: Colors.text.secondary, textAlign: "center", lineHeight: 24 },
   updateBtn: {

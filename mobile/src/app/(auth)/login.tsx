@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { Input } from "@components/ui/Input";
 import { Button } from "@components/ui/Button";
+import { Logo } from "@components/ui/Logo";
 import { useAuthStore } from "@store/authStore";
 import { isValidEmail, isValidPassword } from "@utils/validators";
 
@@ -59,19 +60,7 @@ export default function LoginScreen() {
               <Ionicons name="arrow-back" size={20} color={Colors.text.secondary} />
             </TouchableOpacity>
 
-            <View style={styles.logoRow}>
-              <LinearGradient
-                colors={Colors.gradient.accent}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={styles.logoBox}
-              >
-                <Ionicons name="shirt" size={26} color={Colors.background} />
-              </LinearGradient>
-              <View>
-                <Text style={styles.brandName}>MirrorME</Text>
-                <Text style={styles.brandTagline}>AI Fashion Social</Text>
-              </View>
-            </View>
+            <Logo size="lg" withTagline style={styles.logoRow} />
 
             <Text style={styles.heading}>Welcome{"\n"}back</Text>
           </View>
@@ -175,21 +164,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  logoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: Spacing.xl,
-  },
-  logoBox: {
-    width: 52,
-    height: 52,
-    borderRadius: Radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  brandName: { ...Typography.title3, color: Colors.text.primary },
-  brandTagline: { ...Typography.caption, color: Colors.text.tertiary, marginTop: 1 },
+  logoRow: { marginBottom: Spacing.xl },
   heading: { ...Typography.display, color: Colors.text.primary },
   formCard: {
     marginHorizontal: Spacing.xxl,

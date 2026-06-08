@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import {
   createPost, getFeed, getPost, deletePost, getUserPosts, explorePosts,
 } from "../controllers/postController";

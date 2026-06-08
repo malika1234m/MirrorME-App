@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { body } from "express-validator";
 import { addComment, getComments, deleteComment } from "../controllers/commentController";
 import { authenticate } from "../middleware/auth";

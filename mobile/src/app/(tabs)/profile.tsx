@@ -17,7 +17,7 @@ import { Colors, Typography, Spacing, Radius } from "@constants/colors";
 import { aiService } from "@services/aiService";
 import { userService } from "@services/userService";
 import { StyleDNA } from "@components/profile/StyleDNA";
-import { Post, User, Business } from "@types/index";
+import { Post, User, Business } from "@models/index";
 import { businessService } from "@services/businessService";
 
 type Tab = "posts" | "saved";

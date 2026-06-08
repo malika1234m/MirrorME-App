@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { api } from "@services/api";
 import { authService } from "@services/authService";
-import { User } from "@types/index";
+import { User } from "@models/index";
 
 interface AuthStore {
   user: User | null;

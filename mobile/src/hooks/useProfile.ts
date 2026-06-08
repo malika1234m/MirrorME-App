@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { userService } from "@services/userService";
 import { postService } from "@services/postService";
-import { User, Post } from "@types/index";
+import { User, Post } from "@models/index";
 
 export const useProfile = (userId: string) => {
   const [profile, setProfile] = useState<User | null>(null);

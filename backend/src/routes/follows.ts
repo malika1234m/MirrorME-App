@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { toggleFollow, getFollowers, getFollowing, getProfile } from "../controllers/followController";
 import { authenticate } from "../middleware/auth";
 

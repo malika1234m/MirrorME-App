@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import {
   createProduct, getMyProducts, updateProduct, deleteProduct, toggleSaveProduct,
 } from "../controllers/productController";

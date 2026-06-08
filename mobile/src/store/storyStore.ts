@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { StoryGroup } from "@types/index";
+import { StoryGroup } from "@models/index";
 
 interface StoryStore {
   groups: StoryGroup[];

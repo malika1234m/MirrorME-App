@@ -5,7 +5,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useFeed } from "@hooks/useFeed";
 import { PostCard } from "@components/feed/PostCard";
@@ -13,6 +12,7 @@ import { TrendingSection } from "@components/feed/TrendingSection";
 import { StoriesBar } from "@components/feed/StoriesBar";
 import { OutfitOfTheDay } from "@components/feed/OutfitOfTheDay";
 import { PostCardSkeleton } from "@components/ui/SkeletonCard";
+import { Logo } from "@components/ui/Logo";
 import { Colors, Typography, Spacing } from "@constants/colors";
 
 /* ─── Sticky top bar ───────────────────────────────────────────── */
@@ -20,16 +20,7 @@ const TopBar = ({ topInset }: { topInset: number }) => {
   const router = useRouter();
   return (
     <View style={[styles.header, { paddingTop: topInset + 10 }]}>
-      <View style={styles.logoRow}>
-        <LinearGradient
-          colors={Colors.gradient.accent}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-          style={styles.logoBadge}
-        >
-          <Ionicons name="shirt" size={16} color={Colors.background} />
-        </LinearGradient>
-        <Text style={styles.logoText}>MirrorME</Text>
-      </View>
+      <Logo size="sm" />
       <View style={styles.headerActions}>
         {/* Find This Look shortcut */}
         <TouchableOpacity
@@ -150,12 +141,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.border,
   },
-  logoRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  logoBadge: {
-    width: 32, height: 32, borderRadius: 9,
-    alignItems: "center", justifyContent: "center",
-  },
-  logoText: { color: Colors.primary, fontSize: 20, fontWeight: "900", letterSpacing: -0.5 },
   headerActions: { flexDirection: "row", gap: 4 },
   iconBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
   findBtn: { backgroundColor: Colors.primarySubtle, borderRadius: 12, borderWidth: 1, borderColor: `${Colors.primary}40` },

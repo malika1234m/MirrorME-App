@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { matchByPhoto, getMatchHistory } from "../controllers/matchController";
 import { authenticate } from "../middleware/auth";
 import { uploadForMatch } from "../middleware/upload";

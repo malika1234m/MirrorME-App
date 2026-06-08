@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { Input } from "@components/ui/Input";
 import { Button } from "@components/ui/Button";
+import { Logo } from "@components/ui/Logo";
 import { authService } from "@services/authService";
 import { isValidEmail } from "@utils/validators";
 
@@ -42,6 +43,8 @@ export default function ForgotPasswordScreen() {
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={20} color={Colors.text.secondary} />
           </TouchableOpacity>
+
+          <Logo size="sm" style={styles.logoRow} />
 
           {/* Icon */}
           <View style={styles.iconWrap}>
@@ -107,6 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border,
     alignItems: "center", justifyContent: "center", marginBottom: 8,
   },
+  logoRow: { marginBottom: Spacing.xl },
   iconWrap: { marginBottom: 4 },
   icon: { width: 72, height: 72, borderRadius: 22, alignItems: "center", justifyContent: "center" },
   title: { ...Typography.title1, color: Colors.text.primary },

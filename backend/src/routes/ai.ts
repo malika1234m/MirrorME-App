@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import {
   getAnalysis, reanalyzePost, getStylistAdvice, saveOutfit, getSavedOutfits,
 } from "../controllers/aiController";

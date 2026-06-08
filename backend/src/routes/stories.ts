@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { getStories, createStory, viewStory, getStoryViewers, deleteStory } from "../controllers/storyController";
 import { authenticate } from "../middleware/auth";
 import { uploadStory } from "../middleware/upload";

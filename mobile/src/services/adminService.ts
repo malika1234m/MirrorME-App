@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, Business, User } from "@types/index";
+import { ApiResponse, Business, User } from "@models/index";
 
 interface AdminStats {
   users: number;
@@ -9,11 +9,11 @@ interface AdminStats {
   posts: number;
 }
 
-interface AdminBrand extends Business {
+interface AdminBrand extends Omit<Business, "user"> {
   user: { id: string; email: string; username: string; displayName: string | null };
 }
 
-interface AdminUser extends User {
+interface AdminUser extends Omit<User, "_count"> {
   isAdmin: boolean;
   _count: { posts: number; followers: number };
 }

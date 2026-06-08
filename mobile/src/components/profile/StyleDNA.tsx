@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { Post } from "@types/index";
+import { Post } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 
 interface Props { posts: Post[] }
@@ -120,7 +120,7 @@ export const StyleDNA: React.FC<Props> = ({ posts }) => {
 const StyleBar = ({ style, count, pct, maxCount, rank }: {
   style: string; count: number; pct: number; maxCount: number; rank: number;
 }) => {
-  const fillWidth = `${Math.round((count / maxCount) * 100)}%`;
+  const fillWidth = `${Math.round((count / maxCount) * 100)}%` as `${number}%`;
   const isTop = rank === 1;
 
   return (

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Share, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { User } from "@types/index";
+import { User } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { Avatar } from "@components/ui/Avatar";
 import { Button } from "@components/ui/Button";

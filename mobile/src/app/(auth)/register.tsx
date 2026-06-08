@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { Input } from "@components/ui/Input";
 import { Button } from "@components/ui/Button";
+import { Logo } from "@components/ui/Logo";
 import { useAuthStore } from "@store/authStore";
 import { isValidEmail, isValidUsername, isValidPassword } from "@utils/validators";
 
@@ -66,6 +67,7 @@ export default function RegisterScreen() {
             <TouchableOpacity style={styles.backBtn} onPress={() => step > 0 ? setStep(step - 1) : router.back()}>
               <Ionicons name="arrow-back" size={20} color={Colors.text.secondary} />
             </TouchableOpacity>
+            <Logo size="lg" style={styles.logoRow} />
             <Text style={styles.heading}>Create{"\n"}Account</Text>
             <Text style={styles.subheading}>Join the fashion community</Text>
           </View>
@@ -235,6 +237,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  logoRow: { marginBottom: Spacing.lg },
   heading: { ...Typography.display, color: Colors.text.primary, marginBottom: 6 },
   subheading: { ...Typography.body, color: Colors.text.secondary },
   stepRow: {

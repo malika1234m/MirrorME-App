@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, User } from "@types/index";
+import { ApiResponse, User } from "@models/index";
 
 export const userService = {
   getProfile: (userId: string) =>

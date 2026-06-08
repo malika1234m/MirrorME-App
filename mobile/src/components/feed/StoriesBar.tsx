@@ -10,7 +10,7 @@ import { Avatar } from "@components/ui/Avatar";
 import { storyService } from "@services/storyService";
 import { useStoryStore } from "@store/storyStore";
 import { useAuthStore } from "@store/authStore";
-import { StoryGroup } from "@types/index";
+import { StoryGroup } from "@models/index";
 
 export const StoriesBar: React.FC = () => {
   const router = useRouter();
@@ -91,7 +91,7 @@ const StoryItem = ({ group, onPress }: { group: StoryGroup; onPress: () => void 
 const AddStoryButton = ({ hasStory, onPress }: { hasStory: boolean; onPress: () => void }) => (
   <TouchableOpacity style={styles.item} onPress={onPress} activeOpacity={0.8}>
     <View style={styles.addBtn}>
-      <LinearGradient colors={Colors.gradient.dark} style={StyleSheet.absoluteFill} borderRadius={31} />
+      <LinearGradient colors={Colors.gradient.dark} style={[StyleSheet.absoluteFill, { borderRadius: 31 }]} />
       {hasStory ? (
         /* Has a story — show gradient ring + "+" */
         <LinearGradient

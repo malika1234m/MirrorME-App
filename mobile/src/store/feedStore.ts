@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Post } from "@types/index";
+import { Post } from "@models/index";
 import { postService } from "@services/postService";
 
 interface FeedStore {

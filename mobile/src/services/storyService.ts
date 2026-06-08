@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, Story, StoryGroup } from "@types/index";
+import { ApiResponse, Story, StoryGroup } from "@models/index";
 
 export const storyService = {
   getStories: () =>
@@ -14,7 +14,7 @@ export const storyService = {
     api.post<ApiResponse<null>>(`/stories/${storyId}/view`),
 
   getViewers: (storyId: string) =>
-    api.get<ApiResponse<{ views: Pick<import("@types/index").User, "id" | "username" | "avatarUrl" | "displayName">[]; count: number }>>(`/stories/${storyId}/viewers`),
+    api.get<ApiResponse<{ views: Pick<import("@models/index").User, "id" | "username" | "avatarUrl" | "displayName">[]; count: number }>>(`/stories/${storyId}/viewers`),
 
   deleteStory: (storyId: string) =>
     api.delete<ApiResponse<null>>(`/stories/${storyId}`),

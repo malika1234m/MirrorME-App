@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { Post, Business } from "@types/index";
+import { Post, Business } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { FASHION_STYLES } from "@constants/config";
 import { postService } from "@services/postService";
@@ -124,7 +124,9 @@ const PostCell = ({
 );
 
 /* ─── Block renderers ──────────────────────────────────────── */
-const FeaturedBlock = ({ block, onPress }: { block: Block; onPress: (id: string) => void }) => {
+type FeaturedBlockType = Extract<Block, { type: "featured" | "featured-sm" | "featured-solo" }>;
+
+const FeaturedBlock = ({ block, onPress }: { block: FeaturedBlockType; onPress: (id: string) => void }) => {
   if (block.type === "featured-solo") {
     return <PostCell post={block.posts[0]} width={W} height={Math.floor(W * 0.9)} onPress={() => onPress(block.posts[0].id)} />;
   }

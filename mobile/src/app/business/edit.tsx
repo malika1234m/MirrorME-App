@@ -9,7 +9,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { businessService } from "@services/businessService";
-import { Business } from "@types/index";
+import { Business } from "@models/index";
 
 const CATEGORIES = [
   "Minimalist", "Streetwear", "Old Money", "Sustainable",

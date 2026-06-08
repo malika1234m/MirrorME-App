@@ -11,7 +11,7 @@ import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { Post } from "@types/index";
+import { Post } from "@models/index";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { postService } from "@services/postService";
 import { Avatar } from "@components/ui/Avatar";

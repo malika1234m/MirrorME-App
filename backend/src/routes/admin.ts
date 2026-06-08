@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "../utils/asyncRouter";
 import { authenticate } from "../middleware/auth";
 import { requireAdmin } from "../middleware/admin";
 import {

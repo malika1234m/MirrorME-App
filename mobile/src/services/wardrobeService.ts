@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ApiResponse, Product, SizeRecommendation, UserMeasurements } from "@types/index";
+import { ApiResponse, Product, SizeRecommendation, UserMeasurements } from "@models/index";
 
 export const wardrobeService = {
   getItems: () =>

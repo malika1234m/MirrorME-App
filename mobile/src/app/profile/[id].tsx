@@ -14,7 +14,7 @@ import { PostGrid } from "@components/profile/PostGrid";
 import { ProfileSkeleton } from "@components/ui/SkeletonCard";
 import { Avatar } from "@components/ui/Avatar";
 import { userService } from "@services/userService";
-import { User } from "@types/index";
+import { User } from "@models/index";
 
 export default function UserProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
