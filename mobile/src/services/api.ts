@@ -1,8 +1,19 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { API_URL } from "@constants/config";
 
 const TOKEN_KEY = "mirrorme_token";
+
+// expo-secure-store ships only an empty `{}` native module stub for web, so
+// every method throws "is not a function" there — fall back to localStorage.
+const tokenStorage = Platform.OS === "web"
+  ? {
+      getItemAsync: async (key: string) => globalThis.localStorage?.getItem(key) ?? null,
+      setItemAsync: async (key: string, value: string) => globalThis.localStorage?.setItem(key, value),
+      deleteItemAsync: async (key: string) => globalThis.localStorage?.removeItem(key),
+    }
+  : SecureStore;
 
 class ApiService {
   private client: AxiosInstance;
@@ -15,7 +26,7 @@ class ApiService {
     });
 
     this.client.interceptors.request.use(async (config) => {
-      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      const token = await tokenStorage.getItemAsync(TOKEN_KEY);
       if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     });
@@ -51,15 +62,15 @@ class ApiService {
   }
 
   async saveToken(token: string) {
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    await tokenStorage.setItemAsync(TOKEN_KEY, token);
   }
 
   async clearToken() {
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await tokenStorage.deleteItemAsync(TOKEN_KEY);
   }
 
   async getToken() {
-    return SecureStore.getItemAsync(TOKEN_KEY);
+    return tokenStorage.getItemAsync(TOKEN_KEY);
   }
 }
 

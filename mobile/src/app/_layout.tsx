@@ -7,6 +7,7 @@ import { useAuthStore } from "@store/authStore";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { LoadingSpinner } from "@components/ui/LoadingSpinner";
 import { Logo } from "@components/ui/Logo";
+import { PhoneFrame } from "@components/ui/PhoneFrame";
 import { api } from "@services/api";
 
 const APP_VERSION = "1.0.0"; // must match app.json version
@@ -47,6 +48,7 @@ export default function RootLayout() {
   // Forced update screen
   if (updateRequired) {
     return (
+      <PhoneFrame>
       <View style={styles.updateScreen}>
         <Logo size="md" style={styles.updateLogo} />
         <Text style={styles.updateTitle}>Update Required</Text>
@@ -59,10 +61,12 @@ export default function RootLayout() {
           <Text style={styles.updateBtnText}>Update Now</Text>
         </TouchableOpacity>
       </View>
+      </PhoneFrame>
     );
   }
 
   return (
+    <PhoneFrame>
     <GestureHandlerRootView style={styles.root}>
       <StatusBar style="light" />
       <Stack
@@ -144,6 +148,7 @@ export default function RootLayout() {
         </View>
       )}
     </GestureHandlerRootView>
+    </PhoneFrame>
   );
 }
 

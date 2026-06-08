@@ -32,10 +32,10 @@
       },
       "package": "com.mirrorme.app",
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "RECORD_AUDIO"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "plugins": [
@@ -61,6 +61,13 @@
     "scheme": "mirrorme",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "56e8dcd7-1669-43cd-ac64-5eabb63cf867"
+      }
+    },
+    "owner": "malika_nish"
   }
 }
