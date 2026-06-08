@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from "react";
-import { View, Animated, Dimensions, StyleSheet } from "react-native";
+import { View, Animated, StyleSheet } from "react-native";
 import { Colors } from "@constants/colors";
-
-const { width: W } = Dimensions.get("window");
 
 const Bone = ({
   width,
   height,
+  aspectRatio,
   radius = 8,
   style,
   opacity,
 }: {
   width: number | string;
-  height: number;
+  height?: number;
+  aspectRatio?: number;
   radius?: number;
   style?: object;
   opacity: Animated.AnimatedInterpolation<number>;
@@ -20,7 +20,7 @@ const Bone = ({
   <Animated.View
     style={[
       skeletonStyles.bone,
-      { width, height, borderRadius: radius, opacity },
+      { width, height, aspectRatio, borderRadius: radius, opacity },
       style,
     ]}
   />
@@ -55,7 +55,7 @@ export const PostCardSkeleton: React.FC = () => {
           <Bone width={80} height={10} opacity={opacity} />
         </View>
       </View>
-      <Bone width={W} height={W * 1.25} radius={0} opacity={opacity} />
+      <Bone width="100%" aspectRatio={1 / 1.25} radius={0} opacity={opacity} />
       <View style={styles.actions}>
         <Bone width={60} height={20} opacity={opacity} />
         <Bone width={60} height={20} opacity={opacity} />
@@ -84,13 +84,9 @@ export const ProfileSkeleton: React.FC = () => {
       <Bone width="100%" height={42} radius={12} opacity={opacity} />
       <View style={{ flexDirection: "row", gap: 2 }}>
         {[0, 1, 2].map((i) => (
-          <Bone
-            key={i}
-            width={(W - 32 - 4) / 3}
-            height={(W - 32 - 4) / 3}
-            radius={4}
-            opacity={opacity}
-          />
+          <View key={i} style={{ flex: 1 }}>
+            <Bone width="100%" aspectRatio={1} radius={4} opacity={opacity} />
+          </View>
         ))}
       </View>
     </View>

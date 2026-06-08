@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  Dimensions, Animated, PanResponder, Alert,
+  Animated, PanResponder, Alert,
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,11 +17,6 @@ import { postService } from "@services/postService";
 import { Avatar } from "@components/ui/Avatar";
 import { formatCount, formatTimeAgo } from "@utils/formatters";
 
-const { width: W, height: H } = Dimensions.get("window");
-
-const CARD_W = W - Spacing.lg * 2;
-const CARD_H = H * 0.62;
-const SWIPE_THRESHOLD = W * 0.32;
 const RATING_LABELS: Record<number, string> = {
   1: "Needs Work", 2: "Basic", 3: "Okay", 4: "Decent",
   5: "Average", 6: "Good", 7: "Great", 8: "Fire",
@@ -36,6 +31,16 @@ export default function RateScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [ratedCount, setRatedCount] = useState(0);
   const [swipeDir, setSwipeDir] = useState<"left" | "right" | "up" | null>(null);
+
+  // Measure the deck's own rendered size rather than `Dimensions.get("window")` —
+  // the window is the full browser viewport on web, but the actual card area is
+  // constrained to the PhoneFrame's container (~410px) on desktop web.
+  const [deckSize, setDeckSize] = useState({ width: 0, height: 0 });
+  const CARD_W = deckSize.width > 0 ? deckSize.width - Spacing.lg * 2 : 0;
+  const CARD_H = deckSize.height > 0 ? deckSize.height - 24 : 0;
+  const safeCardW = CARD_W > 0 ? CARD_W : 1;
+  const safeCardH = CARD_H > 0 ? CARD_H : 1;
+  const SWIPE_THRESHOLD = safeCardW * 0.32;
 
   const pan = useRef(new Animated.ValueXY()).current;
   const cardScale = useRef(new Animated.Value(1)).current;
@@ -63,7 +68,7 @@ export default function RateScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     // fly card upward
     Animated.parallel([
-      Animated.timing(pan, { toValue: { x: 0, y: -H }, duration: 300, useNativeDriver: false }),
+      Animated.timing(pan, { toValue: { x: 0, y: -safeCardH * 2 }, duration: 300, useNativeDriver: false }),
       Animated.timing(nextCardScale, { toValue: 1, duration: 300, useNativeDriver: true }),
       Animated.timing(nextNextScale, { toValue: 0.93, duration: 300, useNativeDriver: true }),
     ]).start(() => {
@@ -84,8 +89,8 @@ export default function RateScreen() {
     const score = dir === "up" ? 10 : dir === "right" ? 8 : 3;
     if (dir !== "left") submitRating(post.id, score);
 
-    const targetX = dir === "left" ? -W * 1.5 : dir === "right" ? W * 1.5 : 0;
-    const targetY = dir === "up" ? -H : 0;
+    const targetX = dir === "left" ? -safeCardW * 2 : dir === "right" ? safeCardW * 2 : 0;
+    const targetY = dir === "up" ? -safeCardH * 2 : 0;
 
     Animated.parallel([
       Animated.timing(pan, { toValue: { x: targetX, y: targetY }, duration: 280, useNativeDriver: false }),
@@ -143,10 +148,10 @@ export default function RateScreen() {
   const advanceRef = useRef(advance);
   useEffect(() => { advanceRef.current = advance; }, [advance]);
 
-  const rotate = pan.x.interpolate({ inputRange: [-W * 0.6, 0, W * 0.6], outputRange: ["-12deg", "0deg", "12deg"] });
-  const fireOpacity = pan.x.interpolate({ inputRange: [0, W * 0.2], outputRange: [0, 1], extrapolate: "clamp" });
-  const passOpacity = pan.x.interpolate({ inputRange: [-W * 0.2, 0], outputRange: [1, 0], extrapolate: "clamp" });
-  const iconicOpacity = pan.y.interpolate({ inputRange: [-H * 0.15, 0], outputRange: [1, 0], extrapolate: "clamp" });
+  const rotate = pan.x.interpolate({ inputRange: [-safeCardW * 0.6, 0, safeCardW * 0.6], outputRange: ["-12deg", "0deg", "12deg"] });
+  const fireOpacity = pan.x.interpolate({ inputRange: [0, safeCardW * 0.2], outputRange: [0, 1], extrapolate: "clamp" });
+  const passOpacity = pan.x.interpolate({ inputRange: [-safeCardW * 0.2, 0], outputRange: [1, 0], extrapolate: "clamp" });
+  const iconicOpacity = pan.y.interpolate({ inputRange: [-safeCardH * 0.15, 0], outputRange: [1, 0], extrapolate: "clamp" });
   const greenTint = pan.x.interpolate({ inputRange: [0, SWIPE_THRESHOLD], outputRange: [0, 0.35], extrapolate: "clamp" });
   const redTint = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [0.35, 0], extrapolate: "clamp" });
   const goldTint = pan.y.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [0.35, 0], extrapolate: "clamp" });
@@ -194,57 +199,68 @@ export default function RateScreen() {
       </View>
 
       {/* Card stack */}
-      <View style={styles.deck}>
-        {/* Card 3 (bottom) */}
-        {nextNextPost && (
-          <Animated.View style={[styles.cardWrap, { transform: [{ scale: nextNextScale }], bottom: -18, zIndex: 1 }]}>
-            <OutfitCard post={nextNextPost} />
-          </Animated.View>
+      <View
+        style={styles.deck}
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          setDeckSize({ width, height });
+        }}
+      >
+        {CARD_W > 0 && CARD_H > 0 && (
+          <>
+            {/* Card 3 (bottom) */}
+            {nextNextPost && (
+              <Animated.View style={[styles.cardWrap, { width: CARD_W, transform: [{ scale: nextNextScale }], bottom: -18, zIndex: 1 }]}>
+                <OutfitCard post={nextNextPost} cardH={CARD_H} />
+              </Animated.View>
+            )}
+            {/* Card 2 */}
+            {nextPost && (
+              <Animated.View style={[styles.cardWrap, { width: CARD_W, transform: [{ scale: nextCardScale }], bottom: -9, zIndex: 2 }]}>
+                <OutfitCard post={nextPost} cardH={CARD_H} />
+              </Animated.View>
+            )}
+            {/* Top card - draggable */}
+            <Animated.View
+              {...panResponder.panHandlers}
+              style={[
+                styles.cardWrap,
+                {
+                  width: CARD_W,
+                  zIndex: 10,
+                  transform: [{ translateX: pan.x }, { translateY: pan.y }, { rotate }],
+                },
+              ]}
+            >
+              <OutfitCard post={currentPost} cardH={CARD_H} onAvatarPress={() => router.push(`/profile/${currentPost.user.id}`)} />
+
+              {/* Green overlay (right swipe) */}
+              <Animated.View pointerEvents="none" style={[styles.overlay, { backgroundColor: "#00FF88", opacity: greenTint }]} />
+              {/* Red overlay (left swipe) */}
+              <Animated.View pointerEvents="none" style={[styles.overlay, { backgroundColor: "#FF3CAC", opacity: redTint }]} />
+              {/* Gold overlay (up swipe) */}
+              <Animated.View pointerEvents="none" style={[styles.overlay, { backgroundColor: "#FFD700", opacity: goldTint }]} />
+
+              {/* FIRE badge */}
+              <Animated.View style={[styles.swipeBadge, styles.fireBadge, { opacity: fireOpacity }]}>
+                <Ionicons name="flame" size={18} color={Colors.primary} />
+                <Text style={styles.swipeBadgeText}>FIRE</Text>
+              </Animated.View>
+
+              {/* PASS badge */}
+              <Animated.View style={[styles.swipeBadge, styles.passBadge, { opacity: passOpacity }]}>
+                <Ionicons name="close-circle" size={18} color="#FF3CAC" />
+                <Text style={styles.swipeBadgeText}>PASS</Text>
+              </Animated.View>
+
+              {/* ICONIC badge */}
+              <Animated.View style={[styles.swipeBadge, styles.iconicBadge, { opacity: iconicOpacity }]}>
+                <Ionicons name="star" size={18} color="#FFD700" />
+                <Text style={styles.swipeBadgeText}>ICONIC</Text>
+              </Animated.View>
+            </Animated.View>
+          </>
         )}
-        {/* Card 2 */}
-        {nextPost && (
-          <Animated.View style={[styles.cardWrap, { transform: [{ scale: nextCardScale }], bottom: -9, zIndex: 2 }]}>
-            <OutfitCard post={nextPost} />
-          </Animated.View>
-        )}
-        {/* Top card - draggable */}
-        <Animated.View
-          {...panResponder.panHandlers}
-          style={[
-            styles.cardWrap,
-            {
-              zIndex: 10,
-              transform: [{ translateX: pan.x }, { translateY: pan.y }, { rotate }],
-            },
-          ]}
-        >
-          <OutfitCard post={currentPost} onAvatarPress={() => router.push(`/profile/${currentPost.user.id}`)} />
-
-          {/* Green overlay (right swipe) */}
-          <Animated.View pointerEvents="none" style={[styles.overlay, { backgroundColor: "#00FF88", opacity: greenTint }]} />
-          {/* Red overlay (left swipe) */}
-          <Animated.View pointerEvents="none" style={[styles.overlay, { backgroundColor: "#FF3CAC", opacity: redTint }]} />
-          {/* Gold overlay (up swipe) */}
-          <Animated.View pointerEvents="none" style={[styles.overlay, { backgroundColor: "#FFD700", opacity: goldTint }]} />
-
-          {/* FIRE badge */}
-          <Animated.View style={[styles.swipeBadge, styles.fireBadge, { opacity: fireOpacity }]}>
-            <Ionicons name="flame" size={18} color={Colors.primary} />
-            <Text style={styles.swipeBadgeText}>FIRE</Text>
-          </Animated.View>
-
-          {/* PASS badge */}
-          <Animated.View style={[styles.swipeBadge, styles.passBadge, { opacity: passOpacity }]}>
-            <Ionicons name="close-circle" size={18} color="#FF3CAC" />
-            <Text style={styles.swipeBadgeText}>PASS</Text>
-          </Animated.View>
-
-          {/* ICONIC badge */}
-          <Animated.View style={[styles.swipeBadge, styles.iconicBadge, { opacity: iconicOpacity }]}>
-            <Ionicons name="star" size={18} color="#FFD700" />
-            <Text style={styles.swipeBadgeText}>ICONIC</Text>
-          </Animated.View>
-        </Animated.View>
       </View>
 
       {/* Rating row */}
@@ -284,8 +300,8 @@ export default function RateScreen() {
 }
 
 /* ─── Outfit card ─────────────────────────────────────────── */
-const OutfitCard = ({ post, onAvatarPress }: { post: Post; onAvatarPress?: () => void }) => (
-  <View style={styles.card}>
+const OutfitCard = ({ post, cardH, onAvatarPress }: { post: Post; cardH: number; onAvatarPress?: () => void }) => (
+  <View style={[styles.card, { height: cardH }]}>
     <Image source={{ uri: post.imageUrl }} style={StyleSheet.absoluteFill} contentFit="cover" />
     <LinearGradient colors={["rgba(0,0,0,0.5)", "transparent"]} style={styles.topGrad} />
     <LinearGradient colors={["transparent", "rgba(0,0,0,0.85)"]} style={styles.botGrad} />
@@ -373,9 +389,9 @@ const styles = StyleSheet.create({
   progressTrack: { height: 2, backgroundColor: Colors.card, marginHorizontal: Spacing.lg, borderRadius: 1 },
   progressFill: { height: 2, backgroundColor: Colors.primary, borderRadius: 1 },
   deck: { flex: 1, alignItems: "center", justifyContent: "center", marginTop: 12, marginBottom: 8 },
-  cardWrap: { position: "absolute", width: CARD_W },
+  cardWrap: { position: "absolute" },
   card: {
-    width: CARD_W, height: CARD_H, borderRadius: Radius.xxl,
+    width: "100%", borderRadius: Radius.xxl,
     overflow: "hidden", backgroundColor: Colors.card,
   },
   overlay: { ...StyleSheet.absoluteFillObject, borderRadius: Radius.xxl },
@@ -416,9 +432,9 @@ const styles = StyleSheet.create({
   swipeBadgeText: { ...Typography.title3, color: Colors.white, fontWeight: "800" },
   ratingSection: { paddingHorizontal: Spacing.lg, paddingBottom: 10, gap: 8 },
   ratingHint: { ...Typography.caption, color: Colors.text.tertiary, textAlign: "center" },
-  ratingRow: { flexDirection: "row", justifyContent: "space-between" },
+  ratingRow: { flexDirection: "row", gap: 6 },
   ratingBtn: {
-    width: (W - Spacing.lg * 2 - 9 * 6) / 10, aspectRatio: 1,
+    flex: 1, aspectRatio: 1,
     borderRadius: Radius.md, overflow: "hidden",
     alignItems: "center", justifyContent: "center",
   },

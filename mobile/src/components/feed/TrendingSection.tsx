@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, FlatList, TouchableOpacity,
-  Image, Dimensions, StyleSheet,
+  Image, StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -11,12 +11,14 @@ import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { aiService } from "@services/aiService";
 import { formatCount } from "@utils/formatters";
 
-const { width: W } = Dimensions.get("window");
-const CARD_W = W * 0.42;
-
 export const TrendingSection: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  // Measure the section's own rendered width rather than the window's — the
+  // window width doesn't match the card row's actual size inside the
+  // constrained PhoneFrame container on web.
+  const [containerWidth, setContainerWidth] = useState(0);
   const router = useRouter();
+  const cardW = containerWidth * 0.42;
 
   useEffect(() => {
     aiService.getTrending().then((res) => setPosts(res.data || [])).catch(() => {});
@@ -25,7 +27,7 @@ export const TrendingSection: React.FC = () => {
   if (posts.length === 0) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
       <View style={styles.header}>
         <View style={styles.labelRow}>
           <LinearGradient colors={Colors.gradient.accent} style={styles.fireIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
@@ -38,7 +40,7 @@ export const TrendingSection: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
+      {containerWidth > 0 && <FlatList
         data={posts}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -48,7 +50,7 @@ export const TrendingSection: React.FC = () => {
           <TouchableOpacity
             activeOpacity={0.88}
             onPress={() => router.push(`/post/${item.id}`)}
-            style={styles.card}
+            style={[styles.card, { width: cardW, height: cardW * 1.35 }]}
           >
             <Image source={{ uri: item.imageUrl }} style={styles.image} />
 
@@ -71,7 +73,7 @@ export const TrendingSection: React.FC = () => {
             </LinearGradient>
           </TouchableOpacity>
         )}
-      />
+      />}
     </View>
   );
 };
@@ -96,8 +98,6 @@ const styles = StyleSheet.create({
   title: { ...Typography.title3, color: Colors.text.primary },
   seeAll: { color: Colors.primary, ...Typography.label },
   card: {
-    width: CARD_W,
-    height: CARD_W * 1.35,
     borderRadius: Radius.xl,
     overflow: "hidden",
     backgroundColor: Colors.card,

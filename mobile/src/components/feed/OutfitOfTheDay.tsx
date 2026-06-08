@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,8 +9,6 @@ import { aiService } from "@services/aiService";
 import { Post } from "@models/index";
 import { Avatar } from "@components/ui/Avatar";
 import { formatCount } from "@utils/formatters";
-
-const { width: W } = Dimensions.get("window");
 
 export const OutfitOfTheDay: React.FC = () => {
   const [post, setPost] = useState<Post | null>(null);
@@ -103,8 +101,6 @@ export const OutfitOfTheDay: React.FC = () => {
   );
 };
 
-const CARD_H = W * 0.78;
-
 const styles = StyleSheet.create({
   container: { marginBottom: 8 },
   sectionHeader: {
@@ -117,7 +113,7 @@ const styles = StyleSheet.create({
   },
   ootdBadgeText: { fontSize: 10, fontWeight: "800", color: "#000", letterSpacing: 1 },
   sectionSubtitle: { ...Typography.caption, color: Colors.text.tertiary },
-  card: { height: CARD_H, backgroundColor: Colors.card, overflow: "hidden" },
+  card: { aspectRatio: 1 / 0.78, backgroundColor: Colors.card, overflow: "hidden" },
   topGrad: { position: "absolute", top: 0, left: 0, right: 0, height: 120 },
   botGrad: { position: "absolute", bottom: 0, left: 0, right: 0, height: 220 },
   topRow: {

@@ -23,7 +23,6 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <View style={styles.backdrop}>
       <View style={[styles.device, { width: PHONE_WIDTH, height: frameHeight }]}>
-        <View style={styles.notch} />
         <View style={styles.screen}>{children}</View>
         <View style={styles.homeIndicator} />
       </View>
@@ -50,22 +49,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 60,
     shadowOffset: { width: 0, height: 30 },
-  },
-  notch: {
-    position: "absolute",
-    top: 0,
-    left: "50%",
-    marginLeft: -90,
-    width: 180,
-    height: 28,
-    backgroundColor: "#1c1c1e",
-    borderBottomLeftRadius: 18,
-    borderBottomRightRadius: 18,
-    zIndex: 10,
+    // `position: fixed` descendants (tab bar, headers, etc.) are positioned
+    // relative to the viewport on web unless an ancestor establishes a new
+    // containing block — a `transform` does that, confining them to the frame.
+    ...Platform.select({ web: { transform: [{ translateZ: 0 }] } as object }),
   },
   screen: {
     flex: 1,
     overflow: "hidden",
+    position: "relative",
   },
   homeIndicator: {
     position: "absolute",

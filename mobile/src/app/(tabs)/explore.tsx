@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View, Text, FlatList, ScrollView, RefreshControl,
-  TouchableOpacity, StyleSheet, Dimensions,
+  TouchableOpacity, StyleSheet,
   TextInput, Animated, Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,14 +18,23 @@ import { BrandCard } from "@components/business/BrandCard";
 import { formatCount } from "@utils/formatters";
 
 /* ─── Layout constants ─────────────────────────────────────── */
-const { width: W } = Dimensions.get("window");
 const GAP = 2;
-const BIG_W = Math.floor((W - GAP) * 0.62);
-const BIG_H = Math.floor(BIG_W * 1.35);
-const SM_W  = W - BIG_W - GAP;
-const SM_H  = Math.floor((BIG_H - GAP) / 2);
-const TRI_W = Math.floor((W - GAP * 2) / 3);
-const TRI_H = Math.floor(TRI_W * 1.25);
+
+// Cell sizes are derived from the grid's own measured width rather than
+// `Dimensions.get("window")` — the window is the full browser viewport on
+// web, but the grid is constrained to the PhoneFrame's container (~410px)
+// on desktop web.
+type GridSizes = { BIG_W: number; BIG_H: number; SM_W: number; SM_H: number; TRI_W: number; TRI_H: number };
+
+function computeGridSizes(width: number): GridSizes {
+  const BIG_W = Math.floor((width - GAP) * 0.62);
+  const BIG_H = Math.floor(BIG_W * 1.35);
+  const SM_W  = width - BIG_W - GAP;
+  const SM_H  = Math.floor((BIG_H - GAP) / 2);
+  const TRI_W = Math.floor((width - GAP * 2) / 3);
+  const TRI_H = Math.floor(TRI_W * 1.25);
+  return { BIG_W, BIG_H, SM_W, SM_H, TRI_W, TRI_H };
+}
 
 /* ─── Style tab config ─────────────────────────────────────── */
 const STYLE_ICONS: Record<string, string> = {
@@ -126,9 +135,10 @@ const PostCell = ({
 /* ─── Block renderers ──────────────────────────────────────── */
 type FeaturedBlockType = Extract<Block, { type: "featured" | "featured-sm" | "featured-solo" }>;
 
-const FeaturedBlock = ({ block, onPress }: { block: FeaturedBlockType; onPress: (id: string) => void }) => {
+const FeaturedBlock = ({ block, width, sizes, onPress }: { block: FeaturedBlockType; width: number; sizes: GridSizes; onPress: (id: string) => void }) => {
+  const { BIG_W, BIG_H, SM_W, SM_H } = sizes;
   if (block.type === "featured-solo") {
-    return <PostCell post={block.posts[0]} width={W} height={Math.floor(W * 0.9)} onPress={() => onPress(block.posts[0].id)} />;
+    return <PostCell post={block.posts[0]} width={width} height={Math.floor(width * 0.9)} onPress={() => onPress(block.posts[0].id)} />;
   }
   if (block.type === "featured-sm") {
     return (
@@ -150,12 +160,13 @@ const FeaturedBlock = ({ block, onPress }: { block: FeaturedBlockType; onPress: 
   );
 };
 
-const TrioBlock = ({ block, onPress }: { block: Block; onPress: (id: string) => void }) => {
+const TrioBlock = ({ block, width, sizes, onPress }: { block: Block; width: number; sizes: GridSizes; onPress: (id: string) => void }) => {
+  const { TRI_W, TRI_H } = sizes;
   if (block.type === "trio-solo") {
-    return <PostCell post={block.posts[0]} width={W} height={TRI_H} onPress={() => onPress(block.posts[0].id)} />;
+    return <PostCell post={block.posts[0]} width={width} height={TRI_H} onPress={() => onPress(block.posts[0].id)} />;
   }
   if (block.type === "trio-sm") {
-    const hw = Math.floor((W - GAP) / 2);
+    const hw = Math.floor((width - GAP) / 2);
     return (
       <View style={[styles.row, { gap: GAP }]}>
         {block.posts.map((p) => <PostCell key={p.id} post={p} width={hw} height={TRI_H} onPress={() => onPress(p.id)} />)}
@@ -208,6 +219,8 @@ export default function ExploreScreen() {
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const sizes = containerWidth > 0 ? computeGridSizes(containerWidth) : null;
   const searchAnim = useRef(new Animated.Value(0)).current;
   const searchRef = useRef<TextInput>(null);
 
@@ -291,7 +304,10 @@ export default function ExploreScreen() {
   const styleDesc = STYLE_DESC[selected];
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[styles.container, { paddingTop: insets.top }]}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+    >
       {/* ── Header ── */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
@@ -430,7 +446,7 @@ export default function ExploreScreen() {
           }
           ListEmptyComponent={
             brandsLoading
-              ? <GridSkeleton />
+              ? (sizes ? <GridSkeleton sizes={sizes} /> : null)
               : <EmptyState search={search.trim() ? search : undefined} tab="brands" />
           }
           renderItem={({ item }) => (
@@ -438,7 +454,7 @@ export default function ExploreScreen() {
           )}
         />
       ) : isLoading ? (
-        <GridSkeleton />
+        sizes ? <GridSkeleton sizes={sizes} /> : null
       ) : isSearching ? (
         /* Search results */
         <FlatList
@@ -453,7 +469,7 @@ export default function ExploreScreen() {
             <SearchResult post={item} onPress={() => goToPost(item.id)} />
           )}
         />
-      ) : (
+      ) : sizes ? (
         /* Mixed grid */
         <FlatList
           style={{ flex: 1 }}
@@ -473,40 +489,43 @@ export default function ExploreScreen() {
           ListEmptyComponent={<EmptyState />}
           renderItem={({ item: block }) => {
             if (block.type === "featured" || block.type === "featured-sm" || block.type === "featured-solo") {
-              return <FeaturedBlock block={block} onPress={goToPost} />;
+              return <FeaturedBlock block={block} width={containerWidth} sizes={sizes} onPress={goToPost} />;
             }
-            return <TrioBlock block={block} onPress={goToPost} />;
+            return <TrioBlock block={block} width={containerWidth} sizes={sizes} onPress={goToPost} />;
           }}
         />
-      )}
+      ) : null}
     </View>
   );
 }
 
 /* ─── Skeleton loader ──────────────────────────────────────── */
-const GridSkeleton = () => (
-  <View style={{ flex: 1, gap: GAP }}>
-    <View style={[styles.row, { gap: GAP }]}>
-      <View style={[styles.skeletonCell, { width: BIG_W, height: BIG_H }]} />
-      <View style={{ gap: GAP }}>
-        <View style={[styles.skeletonCell, { width: SM_W, height: SM_H }]} />
-        <View style={[styles.skeletonCell, { width: SM_W, height: SM_H }]} />
+const GridSkeleton = ({ sizes }: { sizes: GridSizes }) => {
+  const { BIG_W, BIG_H, SM_W, SM_H, TRI_W, TRI_H } = sizes;
+  return (
+    <View style={{ flex: 1, gap: GAP }}>
+      <View style={[styles.row, { gap: GAP }]}>
+        <View style={[styles.skeletonCell, { width: BIG_W, height: BIG_H }]} />
+        <View style={{ gap: GAP }}>
+          <View style={[styles.skeletonCell, { width: SM_W, height: SM_H }]} />
+          <View style={[styles.skeletonCell, { width: SM_W, height: SM_H }]} />
+        </View>
+      </View>
+      <View style={[styles.row, { gap: GAP }]}>
+        {[0, 1, 2].map((i) => (
+          <View key={i} style={[styles.skeletonCell, { width: TRI_W, height: TRI_H }]} />
+        ))}
+      </View>
+      <View style={[styles.row, { gap: GAP }]}>
+        <View style={[styles.skeletonCell, { width: BIG_W, height: BIG_H * 0.7 }]} />
+        <View style={{ gap: GAP }}>
+          <View style={[styles.skeletonCell, { width: SM_W, height: SM_H * 0.7 }]} />
+          <View style={[styles.skeletonCell, { width: SM_W, height: SM_H * 0.7 }]} />
+        </View>
       </View>
     </View>
-    <View style={[styles.row, { gap: GAP }]}>
-      {[0, 1, 2].map((i) => (
-        <View key={i} style={[styles.skeletonCell, { width: TRI_W, height: TRI_H }]} />
-      ))}
-    </View>
-    <View style={[styles.row, { gap: GAP }]}>
-      <View style={[styles.skeletonCell, { width: BIG_W, height: BIG_H * 0.7 }]} />
-      <View style={{ gap: GAP }}>
-        <View style={[styles.skeletonCell, { width: SM_W, height: SM_H * 0.7 }]} />
-        <View style={[styles.skeletonCell, { width: SM_W, height: SM_H * 0.7 }]} />
-      </View>
-    </View>
-  </View>
-);
+  );
+};
 
 /* ─── Empty state ──────────────────────────────────────────── */
 const EmptyState = ({ search, tab = "outfits" }: { search?: string; tab?: "outfits" | "brands" }) => (

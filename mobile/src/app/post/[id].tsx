@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   ScrollView, View, Text, Image, TextInput,
   TouchableOpacity, KeyboardAvoidingView, Platform,
-  Dimensions, StyleSheet, Alert, Share,
+  StyleSheet, Alert, Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -24,7 +24,6 @@ import { formatTimeAgo, formatCount } from "@utils/formatters";
 import { postService } from "@services/postService";
 import { aiService } from "@services/aiService";
 
-const { width: W } = Dimensions.get("window");
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -354,7 +353,10 @@ export default function PostDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  heroContainer: { height: W * 1.2, position: "relative" },
+  // `aspectRatio` derives height from the element's own rendered width — unlike
+  // `Dimensions.get("window").width`, it stays correct inside the PhoneFrame's
+  // constrained container on web instead of using the full browser viewport.
+  heroContainer: { aspectRatio: 1 / 1.2, position: "relative" },
   hero: { width: "100%", height: "100%" },
   heroGrad: { position: "absolute", bottom: 0, left: 0, right: 0, height: "50%" },
   navOverlay: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },

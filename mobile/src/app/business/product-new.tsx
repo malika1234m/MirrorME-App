@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, ScrollView,
   Alert, StyleSheet, KeyboardAvoidingView, Platform,
-  ActivityIndicator, Image, Dimensions,
+  ActivityIndicator, Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,8 +12,6 @@ import { useRouter } from "expo-router";
 import { Colors, Typography, Radius, Spacing } from "@constants/colors";
 import { businessService } from "@services/businessService";
 import { useImagePicker } from "@hooks/useImagePicker";
-
-const { width: W } = Dimensions.get("window");
 
 const FASHION_STYLES = [
   "Minimalist", "Streetwear", "Old Money", "Sustainable",
@@ -358,7 +356,7 @@ const styles = StyleSheet.create({
   aiBadgeText: { color: Colors.primary, ...Typography.caption },
 
   /* Preview */
-  previewWrap: { height: W * 0.85, position: "relative" },
+  previewWrap: { aspectRatio: 1 / 0.85, position: "relative" },
   preview: { width: "100%", height: "100%" },
   previewGrad: { position: "absolute", bottom: 0, left: 0, right: 0, height: 100 },
   changeBtn: {

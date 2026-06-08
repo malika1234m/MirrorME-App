@@ -1,5 +1,5 @@
-import React from "react";
-import { View, TouchableOpacity, StyleSheet, Dimensions, Text } from "react-native";
+import React, { useState } from "react";
+import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -8,21 +8,23 @@ import { Post } from "@models/index";
 import { Colors } from "@constants/colors";
 import { formatCount } from "@utils/formatters";
 
-const { width: W } = Dimensions.get("window");
 const GAP = 1.5;
-const CELL = (W - GAP * 2) / 3;
 
 interface Props { posts: Post[] }
 
 export const PostGrid: React.FC<Props> = ({ posts }) => {
   const router = useRouter();
+  // Measure the grid's own rendered width rather than the window's — the window
+  // width doesn't match the grid's actual size inside the constrained PhoneFrame on web.
+  const [containerWidth, setContainerWidth] = useState(0);
+  const cell = containerWidth ? (containerWidth - GAP * 2) / 3 : 0;
 
   return (
-    <View style={styles.grid}>
-      {posts.map((post, index) => {
+    <View style={styles.grid} onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
+      {containerWidth > 0 && posts.map((post, index) => {
         const isFeatured = index % 7 === 0;
-        const size = isFeatured ? CELL * 2 + GAP : CELL;
-        const height = isFeatured ? CELL * 2 + GAP : CELL * 1.3;
+        const size = isFeatured ? cell * 2 + GAP : cell;
+        const height = isFeatured ? cell * 2 + GAP : cell * 1.3;
 
         return (
           <TouchableOpacity

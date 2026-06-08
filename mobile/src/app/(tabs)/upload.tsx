@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   View, Text, Image, TextInput, ScrollView,
   TouchableOpacity, Alert, KeyboardAvoidingView,
-  Platform, StyleSheet, Dimensions,
+  Platform, StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -16,8 +16,6 @@ import { useImagePicker } from "@hooks/useImagePicker";
 import { postService } from "@services/postService";
 import { useFeedStore } from "@store/feedStore";
 import { MAX_CAPTION_LENGTH } from "@constants/config";
-
-const { width: W } = Dimensions.get("window");
 
 export default function UploadScreen() {
   const router = useRouter();
@@ -306,7 +304,7 @@ const styles = StyleSheet.create({
   },
   aiHintText: { color: Colors.primary, ...Typography.caption },
   previewContainer: { marginHorizontal: 0, marginBottom: Spacing.xxl },
-  preview: { width: W, height: W * 1.1, resizeMode: "cover" },
+  preview: { width: "100%", aspectRatio: 1 / 1.1, resizeMode: "cover" },
   previewGrad: { position: "absolute", bottom: 0, left: 0, right: 0, height: 120 },
   changeBtn: { position: "absolute", bottom: 14, right: 14, borderRadius: Radius.full, overflow: "hidden" },
   changeBtnBlur: {

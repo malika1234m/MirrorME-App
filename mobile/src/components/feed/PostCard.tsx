@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   View, Text, Image, TouchableOpacity,
-  Dimensions, StyleSheet, Animated, Share,
+  StyleSheet, Animated, Share,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,8 +15,6 @@ import { formatCount, formatTimeAgo } from "@utils/formatters";
 import { postService } from "@services/postService";
 import { aiService } from "@services/aiService";
 import { useFeedStore } from "@store/feedStore";
-
-const { width: W } = Dimensions.get("window");
 
 interface Props { post: Post }
 
@@ -282,7 +280,7 @@ const styles = StyleSheet.create({
   userInfo: { flex: 1 },
   username: { ...Typography.labelLarge, color: Colors.text.primary },
   timestamp: { ...Typography.caption, color: Colors.text.tertiary, marginTop: 1 },
-  imageContainer: { width: W, height: W * 1.22, backgroundColor: Colors.card },
+  imageContainer: { width: "100%", aspectRatio: 1 / 1.22, backgroundColor: Colors.card },
   image: { width: "100%", height: "100%" },
   bigHeart: {
     position: "absolute",
