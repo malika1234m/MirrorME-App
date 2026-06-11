@@ -1,16 +1,16 @@
 import React, { useState, useRef } from "react";
 import {
-  View, Text, FlatList, Dimensions, TouchableOpacity,
-  StyleSheet, Animated, StatusBar,
+  View, Text, FlatList, TouchableOpacity,
+  StyleSheet, Animated, StatusBar, Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors, Typography, Radius } from "@constants/colors";
+import { Colors, Typography } from "@constants/colors";
 import { Button } from "@components/ui/Button";
 import { Logo } from "@components/ui/Logo";
 
-const { width: W, height: H } = Dimensions.get("window");
+const IS_WEB = Platform.OS === "web";
 
 type IoniconName = keyof typeof Ionicons.glyphMap;
 
@@ -57,12 +57,58 @@ const SLIDES: Slide[] = [
     subtitle: "Browse hundreds of brand designs and see exactly how they look on you — before buying.",
     accent: "#F5A623",
     features: [
-      { icon: "body-outline",     label: "AI body tracking overlays garments live" },
+      { icon: "body-outline",       label: "AI body tracking overlays garments live" },
       { icon: "storefront-outline", label: "Shop from verified brand collections" },
-      { icon: "resize-outline",   label: "Size recommender based on your measurements" },
+      { icon: "resize-outline",     label: "Size recommender based on your measurements" },
     ],
   },
 ];
+
+// Renders one slide's content — used by both web and native paths
+function SlideContent({ item }: { item: Slide }) {
+  return (
+    <>
+      <LinearGradient colors={["#080808", "#0F0F0F"]} style={StyleSheet.absoluteFill} />
+
+      <View style={styles.iconSection}>
+        <LinearGradient
+          colors={item.gradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.iconOuter}
+        >
+          <View style={styles.iconInner}>
+            <Ionicons name={item.icon} size={64} color={Colors.text.inverse} />
+          </View>
+        </LinearGradient>
+        <View style={[styles.glow, { backgroundColor: item.accent + "22" }]} />
+      </View>
+
+      <View style={styles.textSection}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.subtitle}>{item.subtitle}</Text>
+
+        {item.features && (
+          <View style={styles.featureList}>
+            {item.features.map((f, i) => (
+              <View key={i} style={styles.featureRow}>
+                <LinearGradient
+                  colors={item.gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.featureIconWrap}
+                >
+                  <Ionicons name={f.icon} size={15} color={Colors.background} />
+                </LinearGradient>
+                <Text style={styles.featureText}>{f.label}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </>
+  );
+}
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -70,20 +116,97 @@ export default function OnboardingScreen() {
   const flatRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
 
+  const activeSlide = SLIDES[activeIndex];
+
   const goNext = () => {
     if (activeIndex < SLIDES.length - 1) {
-      flatRef.current?.scrollToIndex({ index: activeIndex + 1, animated: true });
+      if (IS_WEB) {
+        setActiveIndex(activeIndex + 1);
+      } else {
+        flatRef.current?.scrollToIndex({ index: activeIndex + 1, animated: true });
+      }
     } else {
       router.replace("/(auth)/login");
     }
   };
 
-  const activeSlide = SLIDES[activeIndex];
+  // ── Dot indicators ────────────────────────────────────────────────
+  const nativeDots = SLIDES.map((_, i) => {
+    const W = 375; // placeholder — overridden per-platform below
+    const inputRange = [(i - 1) * W, i * W, (i + 1) * W];
+    const dotWidth = scrollX.interpolate({ inputRange, outputRange: [8, 24, 8], extrapolate: "clamp" });
+    const opacity  = scrollX.interpolate({ inputRange, outputRange: [0.35, 1, 0.35], extrapolate: "clamp" });
+    return { dotWidth, opacity };
+  });
 
+  // ── Bottom bar (shared) ───────────────────────────────────────────
+  const bottomBar = (
+    <View style={styles.bottom}>
+      <View style={styles.dots}>
+        {SLIDES.map((_, i) =>
+          IS_WEB ? (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                {
+                  width: activeIndex === i ? 24 : 8,
+                  opacity: activeIndex === i ? 1 : 0.35,
+                  backgroundColor: activeSlide.accent,
+                },
+              ]}
+            />
+          ) : (
+            <Animated.View
+              key={i}
+              style={[
+                styles.dot,
+                {
+                  width: nativeDots[i].dotWidth,
+                  opacity: nativeDots[i].opacity,
+                  backgroundColor: activeSlide.accent,
+                },
+              ]}
+            />
+          )
+        )}
+      </View>
+
+      <Button
+        title={activeIndex === SLIDES.length - 1 ? "Get Started" : "Continue"}
+        fullWidth
+        gradient={activeIndex === SLIDES.length - 1}
+        onPress={goNext}
+        style={{ marginBottom: 16 }}
+      />
+
+      <TouchableOpacity onPress={() => router.replace("/(auth)/login")}>
+        <Text style={styles.skip}>Skip</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // ── WEB: simple single-slide display, no FlatList ─────────────────
+  if (IS_WEB) {
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.webFrame}>
+          <Logo size="sm" style={styles.logoRow} />
+          <View style={styles.webSlide}>
+            <SlideContent item={activeSlide} />
+          </View>
+          {bottomBar}
+        </View>
+      </View>
+    );
+  }
+
+  // ── NATIVE: FlatList carousel ─────────────────────────────────────
+  // Re-calculate dots with real scrollX per slide width on native
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-
       <Logo size="sm" style={styles.logoRow} />
 
       <Animated.FlatList
@@ -93,97 +216,48 @@ export default function OnboardingScreen() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
+        style={{ flex: 1 }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: false }
         )}
         onMomentumScrollEnd={(e) =>
-          setActiveIndex(Math.round(e.nativeEvent.contentOffset.x / W))
+          setActiveIndex(Math.round(e.nativeEvent.contentOffset.x / 375))
         }
         renderItem={({ item }) => (
-          <View style={{ width: W, flex: 1 }}>
-            <LinearGradient colors={["#080808", "#0F0F0F"]} style={StyleSheet.absoluteFill} />
-
-            {/* Icon */}
-            <View style={styles.iconSection}>
-              <LinearGradient
-                colors={item.gradient}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={styles.iconOuter}
-              >
-                <View style={styles.iconInner}>
-                  <Ionicons name={item.icon} size={64} color={Colors.text.inverse} />
-                </View>
-              </LinearGradient>
-              <View style={[styles.glow, { backgroundColor: item.accent + "22" }]} />
-            </View>
-
-            {/* Text */}
-            <View style={styles.textSection}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.subtitle}>{item.subtitle}</Text>
-
-              {/* Feature bullets — wardrobe slide only */}
-              {item.features && (
-                <View style={styles.featureList}>
-                  {item.features.map((f: { icon: IoniconName; label: string }, i: number) => (
-                    <View key={i} style={styles.featureRow}>
-                      <LinearGradient
-                        colors={item.gradient}
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={styles.featureIconWrap}
-                      >
-                        <Ionicons name={f.icon} size={15} color={Colors.background} />
-                      </LinearGradient>
-                      <Text style={styles.featureText}>{f.label}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
+          <View style={styles.nativeSlide}>
+            <SlideContent item={item} />
           </View>
         )}
       />
 
-      {/* Bottom UI */}
-      <View style={styles.bottom}>
-        {/* Dots */}
-        <View style={styles.dots}>
-          {SLIDES.map((_, i) => {
-            const inputRange = [(i - 1) * W, i * W, (i + 1) * W];
-            const dotWidth = scrollX.interpolate({
-              inputRange, outputRange: [8, 24, 8], extrapolate: "clamp",
-            });
-            const opacity = scrollX.interpolate({
-              inputRange, outputRange: [0.35, 1, 0.35], extrapolate: "clamp",
-            });
-            return (
-              <Animated.View
-                key={i}
-                style={[styles.dot, { width: dotWidth, opacity, backgroundColor: activeSlide.accent }]}
-              />
-            );
-          })}
-        </View>
-
-        <Button
-          title={activeIndex === SLIDES.length - 1 ? "Get Started" : "Continue"}
-          fullWidth
-          gradient={activeIndex === SLIDES.length - 1}
-          onPress={goNext}
-          style={{ marginBottom: 16 }}
-        />
-
-        <TouchableOpacity onPress={() => router.replace("/(auth)/login")}>
-          <Text style={styles.skip}>Skip</Text>
-        </TouchableOpacity>
-      </View>
+      {bottomBar}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+
+  // Web layout
+  webFrame: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 430,
+    alignSelf: "center",
+    overflow: "hidden",
+  },
+  webSlide: {
+    flex: 1,
+    overflow: "hidden",
+  },
+
+  // Native layout
+  nativeSlide: {
+    width: 375,
+    flex: 1,
+  },
+
   logoRow: {
     position: "absolute",
     top: 56,
@@ -219,6 +293,7 @@ const styles = StyleSheet.create({
     height: 280,
     borderRadius: 140,
     bottom: -60,
+    alignSelf: "center",
   },
 
   textSection: {
@@ -236,15 +311,8 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
-  featureList: {
-    marginTop: 22,
-    gap: 12,
-  },
-  featureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
+  featureList: { marginTop: 22, gap: 12 },
+  featureRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   featureIconWrap: {
     width: 30,
     height: 30,
